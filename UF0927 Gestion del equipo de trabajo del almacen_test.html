@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UF0927 Gestion del equipo de trabajo del almacen</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #F0F0F0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .contenedor-principal {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            padding: 20px;
+            z-index: 1;
+        }
+
+        section.contenedor-test, footer.rectangulo-resumen {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 800px;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .contenedor-secundario {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .titulo-test {
+            font-size: 24px;
+            font-weight: bold;
+            color: #6c757d;
+            margin: 0 0 20px 0;
+            text-align: center;
+        }
+        
+        .pregunta {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: left;
+        }
+        .opciones-contenedor {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .opcion {
+            background-color: #e9ecef;
+            border: 2px solid #e9ecef;
+            color: #495057;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s, border-color 0.2s;
+            text-align: left;
+        }
+        .opcion:hover {
+            background-color: #dee2e6;
+        }
+        .opcion.seleccionada {
+            background-color: #cce5ff;
+            border-color: #cce5ff;
+            color: #004085;
+        }
+        .opcion.correcta {
+            background-color: #85d192;
+            border-color: #85d192;
+            color: #155724;
+            cursor: default;
+        }
+        .opcion.incorrecta {
+            background-color: #f0a1a8;
+            border-color: #f0a1a8;
+            color: #721c24;
+            cursor: default;
+        }
+        .opcion.correcta:hover, .opcion.incorrecta:hover {
+            background-color: #85d192;
+            color: #155724;
+            border-color: #85d192;
+        }
+        .opcion.incorrecta:hover {
+            background-color: #f0a1a8;
+            color: #721c24;
+            border-color: #f0a1a8;
+        }
+        .navegacion-btn-contenedor {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .comprobar-btn, #finalizar-btn, #volver-menu-btn {
+            background-color: #cce5ff;
+            color: #004085;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .comprobar-btn:hover, #finalizar-btn:hover, #volver-menu-btn:hover {
+            background-color: #b3d7ff;
+        }
+        .hidden {
+            display: none;
+        }
+
+        .navegacion-btn {
+            background-color: #E0E0E0;
+            color: #555;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .navegacion-btn:hover {
+            background-color: #CFCFCF;
+        }
+        .navegacion-btn:disabled {
+            background-color: #f1f1f1;
+            color: #aaa;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        footer.rectangulo-resumen {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 800px;
+            margin-top: 20px;
+            overflow-y: auto;
+        }
+        .indices-contenedor {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .indice-pregunta {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            color: #495057;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .indice-pregunta.activa {
+            background-color: #cce5ff;
+            color: #004085;
+            border: none;
+        }
+        .indice-pregunta:hover {
+            background-color: #dee2e6;
+        }
+        .indice-pregunta.correcta {
+            background-color: #85d192;
+            color: #155724;
+        }
+        .indice-pregunta.incorrecta {
+            background-color: #f0a1a8;
+            color: #495057;
+        }
+
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .custom-modal {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .custom-modal h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .custom-modal button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .resultados-finales-container {
+            text-align: center;
+        }
+        .resultados-finales-texto {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .resultados-finales-correctas {
+            color: #155724;
+            font-weight: bold;
+        }
+        .resultados-finales-incorrectas {
+            color: #721c24;
+            font-weight: bold;
+        }
+        .boton-volver-menu {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .boton-volver-menu:hover {
+            background-color: #45a049;
+        }
+
+        @media (max-width: 800px) {
+            section.contenedor-test, footer.rectangulo-resumen {
+                width: 95%;
+                padding: 15px;
+            }
+            .opcion {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="contenedor-principal">
+        <h1 class="titulo-test">UF0927 Gestion del equipo de trabajo del almacen</h1>
+        <section class="contenedor-test">
+            <article id="contenido-pregunta">
+                <div class="pregunta" id="pregunta-texto"></div>
+                <div class="opciones-contenedor" id="opciones-contenedor"></div>
+                <div class="navegacion-btn-contenedor">
+                    <button id="volver-btn" class="navegacion-btn">Anterior</button>
+                    <button id="comprobar-btn" class="comprobar-btn">Comprobar</button>
+                    <button id="siguiente-btn" class="navegacion-btn">Siguiente</button>
+                </div>
+            </article>
+            <div id="resultados-finales" class="hidden resultados-finales-container">
+                <h2>Resultados Finales</h2>
+                <div id="resultados-texto" class="resultados-finales-texto"></div>
+                <button id="volver-menu-btn" class="boton-volver-menu">Volver al menú principal</button>
+            </div>
+        </section>
+        <footer class="rectangulo-resumen" id="rectangulo-resumen">
+            <div class="indices-contenedor" id="indices-contenedor"></div>
+            <button id="finalizar-btn" class="comprobar-btn" style="width: 100%; margin-top: 20px;">Finalizar Test</button>
+        </footer>
+    </div>
+
+    <div id="custom-modal-overlay" class="custom-modal-overlay hidden">
+        <div class="custom-modal">
+            <p id="custom-modal-message"></p>
+            <button id="custom-modal-ok">Aceptar</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let preguntas = [
+  {
+    "question": "No forma parte de las funciones de aprovisionamiento que se logran con la gestión del almacén...",
+    "options": [
+      "a) Minimizar la inversión en el inventario.",
+      "b) Evitar roturas de stock.",
+      "c) Optimizar el precio de compra.",
+      "d) Cooperar con otras áreas, como por ejemplo ventas."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Quién se encarga de supervisar las mercancías que se desplazan desde su almacenamiento hasta su salida del almacén?",
+    "options": [
+      "a) Responsable de movimiento.",
+      "b) Responsable de desplazamiento.",
+      "c) Responsable de almacenamiento.",
+      "d) Responsable del almacén."
+    ],
+    "correct": 0
+  },
+  {
+    "question": "¿Quién realiza la habilidad de organizar físicamente los artículos en el almacén?",
+    "options": [
+      "a) El responsable del almacén.",
+      "b) El mozo de almacén.",
+      "c) El administrativo de almacén.",
+      "d) El mozo administrativo."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Quién se encarga de establecer los objetivos a largo plazo?",
+    "options": [
+      "a) Dirección básica.",
+      "b) El nivel medio.",
+      "c) La alta dirección.",
+      "d) El nivel alto."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "Desde que óptica se considera la ventaja que aporta la dirección por objetivos que establece que \"facilita la delegación de tareas y responsabilidades\"",
+    "options": [
+      "a) Desde la de los subordinados.",
+      "b) Desde la de los directivos.",
+      "c) Desde la de la empresa.",
+      "d) Desde las tres ópticas."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Cómo se consideran los objetivos que son difícilmente modificables?",
+    "options": [
+      "a) Flexibles.",
+      "b) Internos.",
+      "c) Duros.",
+      "d) Rígidos."
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Cómo se considera cuando existen fuertes lazos y una gran afinidad entre los grupos?",
+    "options": [
+      "a) Voluntarios.",
+      "b) Formales.",
+      "c) Primarios.",
+      "d) Secundarios."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Cómo se denomina el líder que permite que los trabajadores participen de forma cooperativa en las decisiones?",
+    "options": [
+      "a) Autoritario.",
+      "b) Democrático.",
+      "c) Consultivo.",
+      "d) Liberal."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Cuáles son las necesidades que buscan que el individuo se sienta aceptado?",
+    "options": [
+      "a) Estima.",
+      "b) Sociales.",
+      "c) Seguridad.",
+      "d) Autorrealización."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "De las siguientes opciones, ¿cuáles de ellas es un factor motivador?",
+    "options": [
+      "a) El reconocimiento.",
+      "b) La responsabilidad.",
+      "c) La retribución.",
+      "d) El reconocimiento, responsabilidad y la retribución."
+    ],
+    "correct": 3
+  },
+  {
+    "question": "El principio que consiste en la especialización de los trabajadores de una empresa se denomina como:",
+    "options": [
+      "a) Polivalencia.",
+      "b) Coordinación.",
+      "c) División de Tareas.",
+      "d) Especialización."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "Es característica el Rol Evaluador en los equipos de trabajo...",
+    "options": [
+      "a) Ser una persona creativa.",
+      "b) Ser un gran estratega.",
+      "c) Ser disciplinado.",
+      "d) Ser muy entusiasta y comunicativo."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "El ruido en el almacén se considera como...",
+    "options": [
+      "a) Una barrera Ruidosa.",
+      "b) Una barrera Física.",
+      "c) Una barrera psicológica.",
+      "d) Una barrera intelectual."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "La solución \"utilizar un vocabulario más amplio y rico\" es solución para",
+    "options": [
+      "a) Una barrera Ruidosa.",
+      "b) Una barrera Física.",
+      "c) Una barrera psicológica.",
+      "d) Una barrera intelectual."
+    ],
+    "correct": 3
+  },
+  {
+    "question": "La actitud que acepta lo que quiere el otro se denomina...",
+    "options": [
+      "a) Activa.",
+      "b) Asertiva.",
+      "c) Pasiva.",
+      "d) Proactiva."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "La característica del mensaje que establece que debe ser inequívoco se denomina...",
+    "options": [
+      "a) Precisión.",
+      "b) Objetividad.",
+      "c) Claridad.",
+      "d) Oportuno."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "La zona para reunir las mercancías que van a un mismo pedido se denomina como...",
+    "options": [
+      "a) Control.",
+      "b) Almacenamiento.",
+      "c) Recepción.",
+      "d) Consolidación."
+    ],
+    "correct": 3
+  },
+  {
+    "question": "La forma que tiene cada una de las partes de un conflicto de manifestar sus deseos se denomina como...",
+    "options": [
+      "a) Intereses.",
+      "b) Posiciones.",
+      "c) Necesidades.",
+      "d) Deseos."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "El conflicto que surge cuando el output de un área es el input de la siguiente se denomina como, interdependencia...",
+    "options": [
+      "a) Combinado.",
+      "b) Secuencial.",
+      "c) Percibido.",
+      "d) Inexacto."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "El modelo sociométrico que utilizaremos para estudiar grupos se denomina como:",
+    "options": [
+      "a) Hot Sociometry.",
+      "b) Cold Sociometry.",
+      "c) Hit Sociometry.",
+      "d) Help sociometry."
+    ],
+    "correct": 0
+  },
+  {
+    "question": "¿Cuál de las siguientes opciones está entre las posibilidades que tienen las empresas para externalizar la formación?",
+    "options": [
+      "a) Contratar los servicios de empresas especializadas de formación.",
+      "b) Constituir un consorcio de empresas con la finalidad de desarrollar un plan de formación conjunto.",
+      "c) Beneficiarse de los servicios de formación que ofrecen las entidades públicas.",
+      "d) Toda las respuestas anteriores son correctas."
+    ],
+    "correct": 3
+  },
+  {
+    "question": "De las siguientes opciones, ¿cuáles son beneficios que aporta la formación a la empresa?",
+    "options": [
+      "a) Consigue una mejor motivación del personal de la organización.",
+      "b) Implementa los objetivos individuales con los de la organización.",
+      "c) Promueve y difunde los cambios dentro de la organización.",
+      "d) Toda las respuestas anteriores son correctas."
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Para poder determinar las necesidades de formación en la empresa se utilizan:",
+    "options": [
+      "a) Cuestionarios de formación.",
+      "b) Inventarios de formación.",
+      "c) Índice de necesidades.",
+      "d) Necesidades de formación."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "De las siguientes opciones, ¿cuál no es una fase del plan de formación?",
+    "options": [
+      "a) Diseño y Creación.",
+      "b) Implementación.",
+      "c) Ejecución.",
+      "d) Evaluación."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "En cuanto a los tipos de contenidos, ¿cuál está relacionado con el contenido procedimental?",
+    "options": [
+      "a) El saber - hacer.",
+      "b) El saber - ser.",
+      "c) El saber.",
+      "d) El ser-hacer."
+    ],
+    "correct": 0
+  },
+  {
+    "question": "En cuanto a los tipos de contenidos, ¿cuál está relacionado con el contenido conceptual?",
+    "options": [
+      "a) El saber - hacer.",
+      "b) El saber - ser.",
+      "c) El saber.",
+      "d) El ser-hacer."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Cuál de las siguientes opciones se encuentra entre las dificultades que conlleva la evaluación?",
+    "options": [
+      "a) El tiempo que requiere.",
+      "b) Las dificultades técnicas.",
+      "c) La falta de autocrítica.",
+      "d) Todas las respuestas anteriores son correctas."
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Los conocimientos que han debido adquirir en la actualidad los trabajadores del almacén están relacionados con:",
+    "options": [
+      "a) Manejo de terminales portátiles.",
+      "b) Conocimiento del código de barras.",
+      "c) Intercambio electrónico de datos.",
+      "d) Todas las respuestas anteriores son correctas."
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Cuál es el método que facilita la transferencia del aprendizaje y no necesita otra instalación aparte?",
+    "options": [
+      "a) Prácticas.",
+      "b) Rotación de puestos.",
+      "c) Enseñanza directa.",
+      "d) Vídeos disponibles en internet o plataformas de formación."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "El inconveniente \"requiere mucho tiempo la formación y puede que la persona no sirva para el puesto\" está relacionado con el método:",
+    "options": [
+      "a) Prácticas.",
+      "b) Rotación de puestos.",
+      "c) Enseñanza directa.",
+      "d) Aprendiz."
+    ],
+    "correct": 3
+  },
+  {
+    "question": "No forma parte de las funciones de aprovisionamiento que se logran con la gestión del almacén...",
+    "options": [
+      "a) Cooperar con otras áreas, como por ejemplo ventas.",
+      "b) Evitar roturas de stock.",
+      "c) Minimizar la inversión en el inventario.",
+      "d) Optimizar el precio de venta de los productos."
+    ],
+    "correct": 3
+  },
+  {
+    "question": "La inspección de las mercaderías le corresponde al...",
+    "options": [
+      "a) Responsable de movimiento.",
+      "b) A todos los responsables del almacén.",
+      "c) Responsable de recepción.",
+      "d) Responsable del almacén."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "La habilidad conocer métodos de gestión de stock corresponde a...",
+    "options": [
+      "a) El mozo de almacén.",
+      "b) Al administrativo del almacén.",
+      "c) Al responsable del almacén.",
+      "d) A todos los anteriores."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "El nivel en el que la toma de decisiones es más compleja es en...",
+    "options": [
+      "a) Nivel medio.",
+      "b) Alta dirección.",
+      "c) Ninguna de las respuestas anteriores es correcta.",
+      "d) Dirección básica."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "La centralización tiende a controlar las decisiones en...",
+    "options": [
+      "a) Ninguna de las respuestas anteriores es correcta.",
+      "b) Alta dirección.",
+      "c) Nivel medio.",
+      "d) Dirección básica."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "La característica que establece que los objetivos deben fijarse para un determinado horizonte de tiempo, se denomina...",
+    "options": [
+      "a) Claridad.",
+      "b) Coherentes.",
+      "c) Realistas.",
+      "d) Precisión."
+    ],
+    "correct": 3
+  },
+  {
+    "question": "La fase de coordinación de los equipos de trabajo en la que la motivación es baja y las metas no están claras se denomina como...",
+    "options": [
+      "a) Producción.",
+      "b) Resolución.",
+      "c) Orientación.",
+      "d) Insatisfacción."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "La acción que consiste en la especialización de los trabajadores se denomina como...",
+    "options": [
+      "a) Centralización.",
+      "b) Ninguna de las anteriores es correcta.",
+      "c) División de tareas.",
+      "d) Concentración."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "La contribución \"ser disciplinado y muy eficiente\" corresponde al papel del:",
+    "options": [
+      "a) Evaluador.",
+      "b) Cerebro.",
+      "c) Investigador.",
+      "d) Implementador."
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Cuando existe una gran diferencia de conocimiento la barrera se denomina...",
+    "options": [
+      "a) Filosófica.",
+      "b) Semántica.",
+      "c) Ninguna de las respuestas anteriores es correcta.",
+      "d) Cultural."
+    ],
+    "correct": 3
+  },
+  {
+    "question": "La zona en la que se depositan los productos que necesitan un análisis previo se denomina...",
+    "options": [
+      "a) De cuarentena.",
+      "b) De envasado.",
+      "c) De almacenaje.",
+      "d) De recepción."
+    ],
+    "correct": 0
+  },
+  {
+    "question": "La causa más complicada de detectar es en el conflicto de...",
+    "options": [
+      "a) Ninguna de las anteriores es correcta.",
+      "b) Necesidades.",
+      "c) Relación.",
+      "d) Valores."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "La emoción que produce un alejamiento del foco del conflicto se denomina...",
+    "options": [
+      "a) Irá.",
+      "b) Miedo.",
+      "c) Aversión.",
+      "d) Tristeza."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "El modelo sociométrico que utilizaremos para estudiar grupos se denomina como:",
+    "options": [
+      "a) Hit Sociometry.",
+      "b) Cold Sociometry.",
+      "c) Help sociometry.",
+      "d) Hot Sociometry."
+    ],
+    "correct": 3
+  },
+  {
+    "question": "De las siguientes afirmaciones no es un beneficio que aporta la formación a la empresa...",
+    "options": [
+      "a) Promueve y difunde los cambios dentro de la organización.",
+      "b) Consigue una mejor motivación del personal de la organización.",
+      "c) Implementa los objetivos individuales con los de la organización.",
+      "d) Ninguna de las respuestas anteriores es correcta."
+    ],
+    "correct": 3
+  },
+  {
+    "question": "No es parte de la estructura del plan de formación...",
+    "options": [
+      "a) Ninguna de las respuestas anteriores es correcta.",
+      "b) Diseño y creación.",
+      "c) Desarrollo.",
+      "d) Evaluación."
+    ],
+    "correct": 0
+  },
+  {
+    "question": "No pertenece al segundo nivel del presupuesto de formación",
+    "options": [
+      "a) Instalaciones.",
+      "b) Remuneración profesorado.",
+      "c) Gastos de gestión del plan.",
+      "d) Material."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "Los contenidos actitudinales son los relacionados con...",
+    "options": [
+      "a) El saber - ser.",
+      "b) El saber.",
+      "c) El saber - hacer.",
+      "d) Todas las respuestas anteriores son correctas."
+    ],
+    "correct": 0
+  },
+  {
+    "question": "El cambio tecnológico en formación conlleva...",
+    "options": [
+      "a) Mejores móviles.",
+      "b) El reciclaje de los trabajadores.",
+      "c) Estudiar con portátiles.",
+      "d) Todas las respuestas anteriores son correctas."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "El inconveniente es demasiado breve para conocer a fondo el puesto corresponde a...",
+    "options": [
+      "a) Tutorías.",
+      "b) Aprendiz.",
+      "c) Todas las anteriores son correctas.",
+      "d) Rotación de puestos."
+    ],
+    "correct": 3
+  }
+];
+            let DOM = {};
+
+            const estado = {
+                preguntaActual: 0,
+                respuestasCorrectas: 0,
+                respuestasIncorrectas: 0,
+                totalPreguntas: preguntas.length
+            };
+
+            let botonesOpciones;
+            let indicesPreguntas;
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            function toggleClasses(element, addClass, removeClasses) {
+                if (removeClasses && removeClasses.length > 0) {
+                    removeClasses.forEach(cls => element.classList.remove(cls));
+                }
+                if (addClass) {
+                    element.classList.add(addClass);
+                }
+            }
+
+            function mostrarModal(message) {
+                DOM.modalMessage.textContent = message;
+                DOM.modalOverlay.classList.remove('hidden');
+            }
+
+            function ocultarModal() {
+                DOM.modalOverlay.classList.add('hidden');
+            }
+
+            function marcarRespuesta(index) {
+                const pregunta = preguntas[index];
+
+                const botonCorrecto = botonesOpciones[pregunta.correct];
+                const indiceCorrecto = indicesPreguntas[index];
+
+                toggleClasses(indiceCorrecto, null, ['correcta', 'incorrecta']);
+
+                if (pregunta.respuestaUsuario !== null) {
+                    toggleClasses(botonCorrecto, 'correcta');
+
+                    if (pregunta.esCorrecta) {
+                        toggleClasses(indiceCorrecto, 'correcta');
+                    } else {
+                        const botonSeleccionado = botonesOpciones[pregunta.respuestaUsuario];
+                        toggleClasses(botonSeleccionado, 'incorrecta');
+                        toggleClasses(indiceCorrecto, 'incorrecta');
+                    }
+                }
+            }
+
+            function mostrarPregunta() {
+                const { preguntaActual, totalPreguntas } = estado;
+                DOM.resultadosFinales.classList.add('hidden');
+                DOM.contenidoPregunta.classList.remove('hidden');
+                DOM.rectanguloResumen.classList.remove('hidden');
+                DOM.finalizarBtn.textContent = 'Finalizar Test';
+
+                const pregunta = preguntas[preguntaActual];
+                const cleanedQuestion = pregunta.question.replace(/^\s*(\d+\.\s*)+/, '');
+                DOM.preguntaTexto.textContent = `${preguntaActual + 1}. ${cleanedQuestion}`;
+
+                botonesOpciones.forEach((boton, index) => {
+                    toggleClasses(boton, null, ['seleccionada', 'correcta', 'incorrecta']);
+                    boton.textContent = pregunta.options[index];
+                    boton.disabled = pregunta.comprobada;
+                });
+
+                if (pregunta.respuestaUsuario !== null) {
+                    toggleClasses(botonesOpciones[pregunta.respuestaUsuario], 'seleccionada');
+                    if (pregunta.comprobada) {
+                        marcarRespuesta(preguntaActual);
+                    }
+                }
+
+                if (indicesPreguntas) {
+                    indicesPreguntas.forEach(indice => indice.classList.remove('activa'));
+                    indicesPreguntas[preguntaActual].classList.add('activa');
+                }
+
+                DOM.comprobarBtn.classList.toggle('hidden', pregunta.comprobada);
+                actualizarEstadoBotones();
+            }
+
+            function manejarSeleccion(event) {
+                const boton = event.target.closest('.opcion');
+                if (boton) {
+                    const pregunta = preguntas[estado.preguntaActual];
+                    if (!pregunta.comprobada) {
+                        botonesOpciones.forEach(b => toggleClasses(b, null, ['seleccionada']));
+                        toggleClasses(boton, 'seleccionada');
+                    }
+                }
+            }
+
+            function comprobarRespuesta() {
+                const respuestaSeleccionadaActual = DOM.opcionesContenedor.querySelector('.opcion.seleccionada');
+                if (!respuestaSeleccionadaActual) {
+                    mostrarModal('Por favor, selecciona una respuesta antes de comprobar.');
+                    return;
+                }
+                const { preguntaActual } = estado;
+                const pregunta = preguntas[preguntaActual];
+                const respuestaIndex = parseInt(respuestaSeleccionadaActual.dataset.index);
+
+                pregunta.respuestaUsuario = respuestaIndex;
+                pregunta.comprobada = true;
+                pregunta.esCorrecta = (respuestaIndex === pregunta.correct);
+
+                if (pregunta.esCorrecta) {
+                    estado.respuestasCorrectas++;
+                } else {
+                    estado.respuestasIncorrectas++;
+                }
+
+                marcarRespuesta(preguntaActual);
+                actualizarResumen();
+
+                botonesOpciones.forEach(boton => boton.disabled = true);
+                DOM.comprobarBtn.classList.add('hidden');
+            }
+
+            function actualizarEstadoBotones() {
+                const { preguntaActual, totalPreguntas } = estado;
+                const esUltimaPregunta = preguntaActual === totalPreguntas - 1;
+                DOM.volverBtn.disabled = preguntaActual === 0;
+                DOM.siguienteBtn.textContent = esUltimaPregunta ? 'Terminar' : 'Siguiente';
+            }
+
+            function siguientePregunta() {
+                const { preguntaActual, totalPreguntas } = estado;
+                if (preguntaActual < totalPreguntas - 1) {
+                    estado.preguntaActual++;
+                    mostrarPregunta();
+                } else {
+                    mostrarResultados();
+                }
+            }
+
+            function volverPregunta() {
+                const { preguntaActual } = estado;
+                if (preguntaActual > 0) {
+                    estado.preguntaActual--;
+                    mostrarPregunta();
+                }
+            }
+
+            function mostrarResultados() {
+                const { respuestasCorrectas, respuestasIncorrectas } = estado;
+                DOM.contenidoPregunta.classList.add('hidden');
+                DOM.resultadosFinales.classList.remove('hidden');
+
+                const correctasSpan = `<span class="resultados-finales-correctas">Correctas: ${respuestasCorrectas}</span>`;
+                const incorrectasSpan = `<span class="resultados-finales-incorrectas">Incorrectas: ${respuestasIncorrectas}</span>`;
+                DOM.resultadosTexto.innerHTML = `${correctasSpan} | ${incorrectasSpan}`;
+
+                DOM.finalizarBtn.textContent = 'Volver al Test';
+                DOM.rectanguloResumen.style.marginTop = '20px';
+            }
+
+            function crearIndices() {
+                DOM.indicesContenedor.innerHTML = Array.from(
+                    {length: estado.totalPreguntas},
+                    (_, i) => `<div class="indice-pregunta" data-index="${i}">${i+1}</div>`
+                ).join('');
+                indicesPreguntas = DOM.indicesContenedor.querySelectorAll('.indice-pregunta');
+            }
+
+            function manejarClickIndice(event) {
+                const indice = event.target.closest('.indice-pregunta');
+                if (indice) {
+                    estado.preguntaActual = parseInt(indice.dataset.index);
+                    mostrarPregunta();
+                }
+            }
+
+            function actualizarResumen() {
+                indicesPreguntas.forEach((indice, index) => {
+                    toggleClasses(indice, null, ['correcta', 'incorrecta']);
+                    const pregunta = preguntas[index];
+                    if (pregunta.comprobada) {
+                        if (pregunta.esCorrecta) {
+                            toggleClasses(indice, 'correcta');
+                        } else {
+                            toggleClasses(indice, 'incorrecta');
+                        }
+                    }
+                });
+            }
+
+            function toggleFinalizarTest() {
+                if (DOM.resultadosFinales.classList.contains('hidden')) {
+                    mostrarResultados();
+                } else {
+                    mostrarPregunta();
+                }
+            }
+            
+            function volverAlMenuPrincipal() {
+                window.location.href = '../MF1014_3 - Organización de Almacenes.html';
+            }
+
+            function cacheElements() {
+                return {
+                    preguntaTexto: document.getElementById('pregunta-texto'),
+                    opcionesContenedor: document.getElementById('opciones-contenedor'),
+                    siguienteBtn: document.getElementById('siguiente-btn'),
+                    volverBtn: document.getElementById('volver-btn'),
+                    comprobarBtn: document.getElementById('comprobar-btn'),
+                    indicesContenedor: document.getElementById('indices-contenedor'),
+                    contenedorTest: document.querySelector('section.contenedor-test'),
+                    rectanguloResumen: document.querySelector('footer.rectangulo-resumen'),
+                    modalOverlay: document.getElementById('custom-modal-overlay'),
+                    modalMessage: document.getElementById('custom-modal-message'),
+                    modalOkBtn: document.getElementById('custom-modal-ok'),
+                    contenidoPregunta: document.getElementById('contenido-pregunta'),
+                    resultadosFinales: document.getElementById('resultados-finales'),
+                    resultadosTexto: document.getElementById('resultados-texto'),
+                    finalizarBtn: document.getElementById('finalizar-btn'),
+                    volverMenuBtn: document.getElementById('volver-menu-btn'),
+                };
+            }
+
+            function initData() {
+                shuffleArray(preguntas);
+                preguntas = preguntas.map(p => ({
+                    ...p,
+                    respuestaUsuario: null,
+                    comprobada: false,
+                    esCorrecta: false
+                }));
+
+                const fragmentoOpciones = document.createDocumentFragment();
+                for (let i = 0; i < 4; i++) {
+                    const boton = document.createElement('button');
+                    boton.className = 'opcion';
+                    boton.dataset.index = i;
+                    fragmentoOpciones.appendChild(boton);
+                }
+                DOM.opcionesContenedor.appendChild(fragmentoOpciones);
+
+                botonesOpciones = Array.from(DOM.opcionesContenedor.querySelectorAll('.opcion'));
+
+                crearIndices();
+            }
+
+            function setupEvents() {
+                DOM.contenedorTest.addEventListener('click', (event) => {
+                    const target = event.target;
+                    if (target.id === 'siguiente-btn') {
+                        siguientePregunta();
+                    } else if (target.id === 'volver-btn') {
+                        volverPregunta();
+                    } else if (target.id === 'comprobar-btn') {
+                        comprobarRespuesta();
+                    } else if (target.classList.contains('opcion')) {
+                        manejarSeleccion(event);
+                    }
+                });
+
+                DOM.rectanguloResumen.addEventListener('click', (event) => {
+                    const target = event.target;
+                    if (target.id === 'finalizar-btn') {
+                        toggleFinalizarTest();
+                    } else if (target.classList.contains('indice-pregunta')) {
+                        manejarClickIndice(event);
+                    }
+                });
+
+                DOM.modalOkBtn.addEventListener('click', ocultarModal);
+                DOM.volverMenuBtn.addEventListener('click', volverAlMenuPrincipal);
+            }
+
+            function init() {
+                DOM = cacheElements();
+                initData();
+                setupEvents();
+                mostrarPregunta();
+            }
+
+            init();
+        });
+    </script>
+</body>
+</html>

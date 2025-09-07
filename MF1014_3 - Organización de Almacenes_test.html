@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MF1014_3 - Organización de Almacenes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #F0F0F0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .contenedor-principal {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            padding: 20px;
+            z-index: 1;
+        }
+
+        section.contenedor-test, footer.rectangulo-resumen {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 800px;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .titulo-test {
+            font-size: 24px;
+            font-weight: bold;
+            color: #6c757d;
+            margin: 0 0 20px 0;
+            text-align: center;
+        }
+
+        .pregunta {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: left;
+        }
+        .opciones-contenedor {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .opcion {
+            background-color: #e9ecef;
+            border: 2px solid #e9ecef;
+            color: #495057;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s, border-color 0.2s;
+            text-align: left;
+        }
+        .opcion:hover {
+            background-color: #dee2e6;
+        }
+        .opcion.seleccionada {
+            background-color: #cce5ff;
+            border-color: #cce5ff;
+            color: #004085;
+        }
+        .opcion.correcta {
+            background-color: #85d192;
+            border-color: #85d192;
+            color: #155724;
+            cursor: default;
+        }
+        .opcion.incorrecta {
+            background-color: #f0a1a8;
+            border-color: #f0a1a8;
+            color: #721c24;
+            cursor: default;
+        }
+        .opcion.correcta:hover, .opcion.incorrecta:hover {
+            background-color: #85d192;
+            color: #155724;
+            border-color: #85d192;
+        }
+        .opcion.incorrecta:hover {
+            background-color: #f0a1a8;
+            color: #721c24;
+            border-color: #f0a1a8;
+        }
+        .navegacion-btn-contenedor {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .comprobar-btn, #finalizar-btn {
+            background-color: #cce5ff;
+            color: #004085;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .comprobar-btn:hover, #finalizar-btn:hover {
+            background-color: #b3d7ff;
+        }
+        .hidden {
+            display: none;
+        }
+
+        .navegacion-btn {
+            background-color: #E0E0E0;
+            color: #555;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .navegacion-btn:hover {
+            background-color: #CFCFCF;
+        }
+        .navegacion-btn:disabled {
+            background-color: #f1f1f1;
+            color: #aaa;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        footer.rectangulo-resumen {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 800px;
+            margin-top: 20px;
+            overflow-y: auto;
+        }
+        .indices-contenedor {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .indice-pregunta {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            color: #495057;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .indice-pregunta.activa {
+            background-color: #cce5ff;
+            color: #004085;
+            border: none;
+        }
+        .indice-pregunta:hover {
+            background-color: #dee2e6;
+        }
+        .indice-pregunta.correcta {
+            background-color: #85d192;
+            color: #155724;
+        }
+        .indice-pregunta.incorrecta {
+            background-color: #f0a1a8;
+            color: #495057;
+        }
+
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .custom-modal {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .custom-modal h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .custom-modal button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .resultados-finales-container {
+            text-align: center;
+        }
+        .resultados-finales-texto {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .resultados-finales-correctas {
+            color: #155724;
+            font-weight: bold;
+        }
+        .resultados-finales-incorrectas {
+            color: #721c24;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 800px) {
+            section.contenedor-test, footer.rectangulo-resumen {
+                width: 95%;
+                padding: 15px;
+            }
+            .opcion {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="contenedor-principal">
+        <h1 class="titulo-test">MF1014_3 - Organización de Almacenes</h1>
+        <section class="contenedor-test">
+            <article id="contenido-pregunta">
+                <div class="pregunta" id="pregunta-texto"></div>
+                <div class="opciones-contenedor" id="opciones-contenedor"></div>
+                <div class="navegacion-btn-contenedor">
+                    <button id="volver-btn" class="navegacion-btn">Anterior</button>
+                    <button id="comprobar-btn" class="comprobar-btn">Comprobar</button>
+                    <button id="siguiente-btn" class="navegacion-btn">Siguiente</button>
+                </div>
+            </article>
+            <div id="resultados-finales" class="hidden resultados-finales-container">
+                <h2>Resultados Finales</h2>
+                <div id="resultados-texto" class="resultados-finales-texto"></div>
+                
+            </div>
+        </section>
+        <footer class="rectangulo-resumen" id="rectangulo-resumen">
+            <div class="indices-contenedor" id="indices-contenedor"></div>
+            <button id="finalizar-btn" class="comprobar-btn" style="width: 100%; margin-top: 20px;">Finalizar Test</button>
+        </footer>
+    </div>
+
+    <div id="custom-modal-overlay" class="custom-modal-overlay hidden">
+        <div class="custom-modal">
+            <p id="custom-modal-message"></p>
+            <button id="custom-modal-ok">Aceptar</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let preguntas = [{
+    "question": "¿Qué herramienta permite conocer las relaciones sociales dentro de un equipo de trabajo?",
+    "options": [
+      "a) Organigrama",
+      "b) Matriz de riesgos",
+      "c) Sociograma",
+      "d) Diagrama de Gantt"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Cuál es una medida preventiva frente a incendios?",
+    "options": [
+      "a) Disponer de puertas de emergencia",
+      "b) No fumar",
+      "c) Apagar el móvil",
+      "d) Mantener extintores operativos y accesibles"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Qué es el feedback?",
+    "options": [
+      "a) Datos de inventario",
+      "b) Información contable",
+      "c) Retroalimentación sobre el desempeño",
+      "d) Quejas del equipo"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué sistema de gestión de stock trabaja con entradas y salidas en orden cronológico?",
+    "options": [
+      "a) ABC",
+      "b) LIFO",
+      "c) FIFO",
+      "d) JIT"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué ocurre si hay exceso de stock?",
+    "options": [
+      "a) Disminución del capital",
+      "b) Mayor productividad",
+      "c) Se mejora la calidad",
+      "d) Aumento de costes y riesgo de obsolescencia"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Qué método permite clasificar productos según su importancia?",
+    "options": [
+      "a) LIFO",
+      "b) JIT",
+      "c) ABC",
+      "d) FIFO"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué es un pedido programado?",
+    "options": [
+      "a) Un pedido hecho por error",
+      "b) Un pedido que se realiza en fechas acordadas previamente",
+      "c) Un pedido con devolución",
+      "d) Un pedido sin coste"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué equipo se debe utilizar al manipular productos tóxicos?",
+    "options": [
+      "a) Protección visual",
+      "b) Calzado de seguridad",
+      "c) Guantes y mascarilla",
+      "d) Chaleco reflectante"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué es el stock de seguridad?",
+    "options": [
+      "a) El pedido mínimo a proveedor",
+      "b) La cantidad de stock que se vende cada día",
+      "c) El stock adicional para evitar roturas",
+      "d) El stock obsoleto en el almacén"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "El método FIFO se utiliza para:",
+    "options": [
+      "a) Sacar primero el producto más caro",
+      "b) Garantizar mayor beneficio",
+      "c) Organizar el almacén por color",
+      "d) Evitar obsolescencia del producto"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Quién es el responsable de cumplir las normas de seguridad en el almacén?",
+    "options": [
+      "a) El personal de mantenimiento",
+      "b) El servicio médico",
+      "c) El jefe de almacén",
+      "d) El trabajador"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Qué son los EPIs?",
+    "options": [
+      "a) Equipos de Protección Individual",
+      "b) Estanterías personales industriales",
+      "c) Equipos de planificación interna",
+      "d) Estándares para inventario"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "¿Cuál es el principal objetivo de la prevención de riesgos laborales?",
+    "options": [
+      "a) Reducir el coste del almacén",
+      "b) Proteger la salud y seguridad de los trabajadores",
+      "c) Disminuir el tiempo de carga",
+      "d) Aumentar la productividad"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué tipo de liderazgo mejora más la motivación interna?",
+    "options": [
+      "a) Directivo",
+      "b) Coercitivo",
+      "c) Transformacional",
+      "d) Autocrático"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué representa el stock máximo?",
+    "options": [
+      "a) El número total de proveedores",
+      "b) La cantidad diaria de ventas",
+      "c) El coste máximo permitido",
+      "d) La cantidad más alta que se puede almacenar"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Cuál de estas es una técnica para resolver conflictos?",
+    "options": [
+      "a) Supervisión excesiva",
+      "b) División del equipo",
+      "c) Negociación",
+      "d) Sanción directa"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Cuál de las siguientes actitudes es típica del liderazgo autocrático?",
+    "options": [
+      "a) Escucha activa",
+      "b) Toma de decisiones sin consultar",
+      "c) Delegación de funciones",
+      "d) Fomento de ideas"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué debemos hacer ante un incendio en el almacén?",
+    "options": [
+      "a) Avisar al jefe de almacén",
+      "b) Utilizar los extintores",
+      "c) Ignorarlo si es pequeño y continuar trabajando",
+      "d) Activar el protocolo de evacuación y avisar a emergencias"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Qué tipo de riesgo representa una estantería mal anclada?",
+    "options": [
+      "a) Mecánico",
+      "b) Químico",
+      "c) Ocasional",
+      "d) Preventivo"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "Un pedido pendiente es aquel que:",
+    "options": [
+      "a) Está en inventario",
+      "b) Ha sido solicitado, pero aún no recibido",
+      "c) Ha sido cancelado",
+      "d) No se piensa enviar"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Cuál de las siguientes competencias es fundamental en un responsable de almacén?",
+    "options": [
+      "a) Liderazgo",
+      "b) Contabilidad",
+      "c) Mecánica y mantenimiento",
+      "d) Conocer lenguas extranjeras"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "¿Cuál es la mejor forma de levantar peso desde el suelo?",
+    "options": [
+      "a) Con las piernas rectas y la espalda flexionada",
+      "b) Desde la cintura, flexionando rodillas",
+      "c) Girando el tronco",
+      "d) Flexionando las rodillas y manteniendo la espalda recta"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Qué es el picking?",
+    "options": [
+      "a) Un sistema de almacenaje",
+      "b) El transporte de mercancía",
+      "c) La preparación de pedidos",
+      "d) La recepción de pedidos"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué estilo de liderazgo se basa en la confianza plena en el equipo sin supervisión directa?",
+    "options": [
+      "a) Democrático",
+      "b) Autocrático",
+      "c) Transformacional",
+      "d) Laissez-faire"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Qué se debe hacer antes de usar una carretilla elevadora?",
+    "options": [
+      "a) Leer el inventario",
+      "b) Ubicarla en el lugar correcto",
+      "c) Cambiar el aceite",
+      "d) Comprobar su estado y funcionamiento"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "El uso de un chaleco reflectante en el almacén es un ejemplo de:",
+    "options": [
+      "a) EPI innecesario",
+      "b) Riesgo laboral",
+      "c) Medida preventiva",
+      "d) Causa de accidente"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Cuál es el stock disponible?",
+    "options": [
+      "a) El solicitado en pedidos abiertos",
+      "b) El que está en almacén y libre para usar",
+      "c) El que está en camino",
+      "d) Todo el que está reservado"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué situación puede generar un conflicto en el almacén?",
+    "options": [
+      "a) Claridad de roles",
+      "b) Formación continua",
+      "c) Falta de comunicación",
+      "d) Liderazgo participativo"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué es una evaluación de riesgos?",
+    "options": [
+      "a) Un análisis de peligros y medidas preventivas",
+      "b) Un examen sobre los conocimientos en PRL",
+      "c) Una simulación de posibles accidentes",
+      "d) Un curso de primeros auxilios"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "¿Qué se entiende por motivación extrínseca?",
+    "options": [
+      "a) La que surge del trabajo en equipo",
+      "b) La que se basa en los intereses del grupo",
+      "c) La que proviene de recompensas externas",
+      "d) La que nace de la satisfacción personal"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Cuál es el propósito de los pasillos señalizados en el almacén?",
+    "options": [
+      "a) Aparcar carretillas",
+      "b) Garantizar rutas seguras de tránsito",
+      "c) Orden y limpieza",
+      "d) Facilitar las ubicaciones de los productos"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "El sistema LIFO consiste en:",
+    "options": [
+      "a) No realizar rotación de stock",
+      "b) Almacenar productos por fecha",
+      "c) Sacar primero el último producto que entró",
+      "d) Entregar primero los productos más antiguos"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Cuál de los siguientes factores afecta al stock de seguridad?",
+    "options": [
+      "a) El nombre del proveedor",
+      "b) La variabilidad de la demanda",
+      "c) El IVA del producto",
+      "d) El número de trabajadores"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué documento acompaña siempre la salida de mercancía?",
+    "options": [
+      "a) Albarán",
+      "b) Inventario",
+      "c) Nota de pedido",
+      "d) Documento de rotación"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "¿Qué herramienta se usa para repartir las tareas dentro del equipo?",
+    "options": [
+      "a) Plan de evacuación",
+      "b) Currículum",
+      "c) Sociograma",
+      "d) Cuadro de responsabilidades"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Cuál de las siguientes opciones corresponde a un coste de almacenamiento?",
+    "options": [
+      "a) Coste de oportunidad",
+      "b) Generación del albarán",
+      "c) Seguro del almacén",
+      "d) Preparación del pedido"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué indicador mide el nivel de compromiso del equipo?",
+    "options": [
+      "a) Clima laboral",
+      "b) Productividad individual",
+      "c) Horas extras",
+      "d) Nivel de stock"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "¿Qué tipo de protección ofrecen los cascos de seguridad?",
+    "options": [
+      "a) Contra ruido",
+      "b) Contra caídas",
+      "c) Contra golpes",
+      "d) Protección eléctrica"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué sistema tiene menor nivel de inventario?",
+    "options": [
+      "a) LIFO",
+      "b) FIFO",
+      "c) Just in Time (JIT)",
+      "d) ABC"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué estilo de liderazgo busca el consenso y la participación del equipo?",
+    "options": [
+      "a) Coercitivo",
+      "b) Democrático",
+      "c) Laissez-faire",
+      "d) Autocrático"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué herramienta informática se usa habitualmente para controlar el stock?",
+    "options": [
+      "a) CRM",
+      "b) ERP",
+      "c) Navegador web",
+      "d) GPS"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "El inventario rotativo:",
+    "options": [
+      "a) Revisa ciertas referencias periódicamente",
+      "b) Se realiza una vez al año",
+      "c) Cuenta todo el stock en un solo día",
+      "d) Es una estimación teórica"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "¿Qué documento acredita que un trabajador ha recibido formación en prevención?",
+    "options": [
+      "a) Parte de trabajo",
+      "b) Ficha de trabajador",
+      "c) Nómina",
+      "d) Certificado de formación en PRL"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Cuál es el riesgo principal al manipular cargas manualmente?",
+    "options": [
+      "a) Cortes",
+      "b) Lesiones musculoesqueléticas",
+      "c) Mareos",
+      "d) Picaduras"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué representa el lead time?",
+    "options": [
+      "a) El tiempo entre el pedido y su recepción",
+      "b) El tiempo de rotura de stock",
+      "c) El tiempo para vender un producto",
+      "d) El tiempo que dura el inventario"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "En el análisis ABC, los productos clase A:",
+    "options": [
+      "a) Son los menos importantes",
+      "b) No se almacenan",
+      "c) Representan un porcentaje pequeño de artículos, pero alto en valor",
+      "d) Se utilizan solo en oficinas"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué tipo de extintor se utiliza para fuegos eléctricos?",
+    "options": [
+      "a) Polvo",
+      "b) Espuma",
+      "c) Agua",
+      "d) CO₂ (dióxido de carbono)"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Qué es un pedido en firme?",
+    "options": [
+      "a) Una cotización no confirmada",
+      "b) Un pedido sugerido",
+      "c) Un pedido sin stock disponible",
+      "d) Una solicitud definitiva de compra"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Qué tipo de conflicto es más común en los equipos de trabajo?",
+    "options": [
+      "a) Estructural",
+      "b) Financiero",
+      "c) Tecnológico",
+      "d) Interpersonal"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Un suelo mojado en el almacén puede generar:",
+    "options": [
+      "a) Caídas al mismo nivel",
+      "b) Caídas a distinto nivel",
+      "c) Todas son correctas",
+      "d) Caídas por deslizamiento"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué técnica de resolución de conflictos consiste en que ambas partes ceden parcialmente?",
+    "options": [
+      "a) Acomodación",
+      "b) Evasión",
+      "c) Competencia",
+      "d) Compromiso"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Qué acción es obligatoria antes de subir a una plataforma elevadora?",
+    "options": [
+      "a) Revisar su estado y uso de arnés si corresponde",
+      "b) Cargar completamente la batería",
+      "c) Disponer de la autorización correspondiente",
+      "d) Hacer una foto"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "¿Qué indica el punto de pedido?",
+    "options": [
+      "a) El momento de lanzar el pedido",
+      "b) El nivel mínimo del proveedor",
+      "c) El tiempo de entrega",
+      "d) El precio más bajo"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "¿Cuál es un riesgo ergonómico típico en el almacén?",
+    "options": [
+      "a) Movimientos repetitivos",
+      "b) Incendio",
+      "c) Explosión",
+      "d) Electricidad"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "¿Cuál es el objetivo del stock mínimo?",
+    "options": [
+      "a) Mantener productos de baja rotación",
+      "b) Calcular el precio del producto",
+      "c) Reducir el espacio en el almacén",
+      "d) Avisar cuándo es necesario realizar un pedido"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Qué función tiene el albarán?",
+    "options": [
+      "a) Pedir mercancía nueva",
+      "b) Confirmar la entrega del pedido",
+      "c) Sustituir la factura",
+      "d) Indicar el precio del producto"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Cuál es el objetivo de una reunión de equipo?",
+    "options": [
+      "a) Controlar horarios",
+      "b) Registrar entregas",
+      "c) Asignar castigos",
+      "d) Compartir información y tomar decisiones"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Qué es la trazabilidad?",
+    "options": [
+      "a) Seguir el rastro de un producto durante la cadena logística",
+      "b) Reparto de última milla",
+      "c) Hacer devoluciones, también conocida como logística inversa",
+      "d) Fase de seguimiento de un pedido"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "¿Cuál es el principal objetivo del control de stock?",
+    "options": [
+      "a) Reducir personal",
+      "b) Evitar roturas y excesos de inventario",
+      "c) Almacenar más productos",
+      "d) Reducir devoluciones"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué tipo de stock se considera en tránsito?",
+    "options": [
+      "a) Stock obsoleto",
+      "b) Stock pendiente de fabricación",
+      "c) Stock físico en el almacén",
+      "d) Stock que está siendo transportado"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Qué factor influye directamente en la rotación de stock?",
+    "options": [
+      "a) El nivel de ventas",
+      "b) El nombre del proveedor",
+      "c) El tamaño del almacén",
+      "d) El número de trabajadores"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "¿Cuál de los siguientes documentos es indispensable para preparar un pedido?",
+    "options": [
+      "a) Factura",
+      "b) Nota de abono",
+      "c) Hoja de devolución",
+      "d) Albarán"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Qué documento se utiliza para registrar errores de stock?",
+    "options": [
+      "a) Albarán",
+      "b) Pedido de compra",
+      "c) Devolución",
+      "d) Parte de incidencia"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Qué elemento influye directamente en la productividad del almacén?",
+    "options": [
+      "a) El color del almacén",
+      "b) El trabajo en equipo",
+      "c) El tipo de uniforme",
+      "d) El tamaño de las etiquetas"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué es la asertividad?",
+    "options": [
+      "a) Gritar para imponer una idea",
+      "b) Expresar opiniones respetando a los demás",
+      "c) Evitar dar la opinión",
+      "d) Callarse para evitar conflictos"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué es un ERP?",
+    "options": [
+      "a) Un tipo de contenedor marítimo",
+      "b) Un software de gestión empresarial",
+      "c) Un método de transporte",
+      "d) Un equipo de manutención autónomo"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Cuál es la normativa básica de referencia en España sobre prevención?",
+    "options": [
+      "a) Ley 31/1995, de 8 de noviembre",
+      "b) Real Decreto 1495/1986, de 26 de mayo",
+      "c) Real Decreto 1215/1997, de 18 de julio",
+      "d) Estatuto de los Trabajadores"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "¿Qué beneficio tiene la formación continua en un equipo?",
+    "options": [
+      "a) Disminuye la comunicación",
+      "b) Aumenta la rotación",
+      "c) Mejora la competencia profesional",
+      "d) Reduce el liderazgo"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué favorece un entorno colaborativo en el almacén?",
+    "options": [
+      "a) Turnos inestables",
+      "b) Jerarquía rígida",
+      "c) Individualismo",
+      "d) Objetivos comunes"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Qué elemento es clave en la gestión de un conflicto?",
+    "options": [
+      "a) La escucha activa",
+      "b) La sanción inmediata",
+      "c) El castigo",
+      "d) La rapidez"
+    ],
+    "correct": 0
+  }
+];
+            let DOM = {};
+
+            const estado = {
+                preguntaActual: 0,
+                respuestasCorrectas: 0,
+                respuestasIncorrectas: 0,
+                totalPreguntas: preguntas.length
+            };
+
+            let botonesOpciones;
+            let indicesPreguntas;
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            function toggleClasses(element, addClass, removeClasses) {
+                if (removeClasses && removeClasses.length > 0) {
+                    removeClasses.forEach(cls => element.classList.remove(cls));
+                }
+                if (addClass) {
+                    element.classList.add(addClass);
+                }
+            }
+
+            function mostrarModal(message) {
+                DOM.modalMessage.textContent = message;
+                DOM.modalOverlay.classList.remove('hidden');
+            }
+
+            function ocultarModal() {
+                DOM.modalOverlay.classList.add('hidden');
+            }
+
+            function marcarRespuesta(index) {
+                const pregunta = preguntas[index];
+
+                const botonCorrecto = botonesOpciones[pregunta.correct];
+                const indiceCorrecto = indicesPreguntas[index];
+
+                toggleClasses(indiceCorrecto, null, ['correcta', 'incorrecta']);
+
+                if (pregunta.respuestaUsuario !== null) {
+                    toggleClasses(botonCorrecto, 'correcta');
+
+                    if (pregunta.esCorrecta) {
+                        toggleClasses(indiceCorrecto, 'correcta');
+                    } else {
+                        const botonSeleccionado = botonesOpciones[pregunta.respuestaUsuario];
+                        toggleClasses(botonSeleccionado, 'incorrecta');
+                        toggleClasses(indiceCorrecto, 'incorrecta');
+                    }
+                }
+            }
+
+            function mostrarPregunta() {
+                const { preguntaActual, totalPreguntas } = estado;
+                DOM.resultadosFinales.classList.add('hidden');
+                DOM.contenidoPregunta.classList.remove('hidden');
+                DOM.rectanguloResumen.classList.remove('hidden');
+                DOM.finalizarBtn.textContent = 'Finalizar Test';
+
+                const pregunta = preguntas[preguntaActual];
+                const cleanedQuestion = pregunta.question.replace(/^\s*(\d+\.\s*)+/, '');
+                DOM.preguntaTexto.textContent = `${preguntaActual + 1}. ${cleanedQuestion}`;
+
+                botonesOpciones.forEach((boton, index) => {
+                    toggleClasses(boton, null, ['seleccionada', 'correcta', 'incorrecta']);
+                    boton.textContent = pregunta.options[index];
+                    boton.disabled = pregunta.comprobada;
+                });
+
+                if (pregunta.respuestaUsuario !== null) {
+                    toggleClasses(botonesOpciones[pregunta.respuestaUsuario], 'seleccionada');
+                    if (pregunta.comprobada) {
+                        marcarRespuesta(preguntaActual);
+                    }
+                }
+
+                if (indicesPreguntas) {
+                    indicesPreguntas.forEach(indice => indice.classList.remove('activa'));
+                    indicesPreguntas[preguntaActual].classList.add('activa');
+                }
+
+                DOM.comprobarBtn.classList.toggle('hidden', pregunta.comprobada);
+                actualizarEstadoBotones();
+            }
+
+            function manejarSeleccion(event) {
+                const boton = event.target.closest('.opcion');
+                if (boton) {
+                    const pregunta = preguntas[estado.preguntaActual];
+                    if (!pregunta.comprobada) {
+                        botonesOpciones.forEach(b => toggleClasses(b, null, ['seleccionada']));
+                        toggleClasses(boton, 'seleccionada');
+                    }
+                }
+            }
+
+            function comprobarRespuesta() {
+                const respuestaSeleccionadaActual = DOM.opcionesContenedor.querySelector('.opcion.seleccionada');
+                if (!respuestaSeleccionadaActual) {
+                    mostrarModal('Por favor, selecciona una respuesta antes de comprobar.');
+                    return;
+                }
+                const { preguntaActual } = estado;
+                const pregunta = preguntas[preguntaActual];
+                const respuestaIndex = parseInt(respuestaSeleccionadaActual.dataset.index);
+
+                pregunta.respuestaUsuario = respuestaIndex;
+                pregunta.comprobada = true;
+                pregunta.esCorrecta = (respuestaIndex === pregunta.correct);
+
+                if (pregunta.esCorrecta) {
+                    estado.respuestasCorrectas++;
+                } else {
+                    estado.respuestasIncorrectas++;
+                }
+
+                marcarRespuesta(preguntaActual);
+                actualizarResumen();
+
+                botonesOpciones.forEach(boton => boton.disabled = true);
+                DOM.comprobarBtn.classList.add('hidden');
+            }
+
+            function actualizarEstadoBotones() {
+                const { preguntaActual, totalPreguntas } = estado;
+                const esUltimaPregunta = preguntaActual === totalPreguntas - 1;
+                DOM.volverBtn.disabled = preguntaActual === 0;
+                DOM.siguienteBtn.textContent = esUltimaPregunta ? 'Terminar' : 'Siguiente';
+            }
+
+            function siguientePregunta() {
+                const { preguntaActual, totalPreguntas } = estado;
+                if (preguntaActual < totalPreguntas - 1) {
+                    estado.preguntaActual++;
+                    mostrarPregunta();
+                } else {
+                    mostrarResultados();
+                }
+            }
+
+            function volverPregunta() {
+                const { preguntaActual } = estado;
+                if (preguntaActual > 0) {
+                    estado.preguntaActual--;
+                    mostrarPregunta();
+                }
+            }
+
+            function mostrarResultados() {
+                const { respuestasCorrectas, respuestasIncorrectas } = estado;
+                DOM.contenidoPregunta.classList.add('hidden');
+                DOM.resultadosFinales.classList.remove('hidden');
+
+                const correctasSpan = `<span class="resultados-finales-correctas">Correctas: ${respuestasCorrectas}</span>`;
+                const incorrectasSpan = `<span class="resultados-finales-incorrectas">Incorrectas: ${respuestasIncorrectas}</span>`;
+                DOM.resultadosTexto.innerHTML = `${correctasSpan} | ${incorrectasSpan}`;
+
+                DOM.finalizarBtn.textContent = 'Volver al Test';
+                DOM.rectanguloResumen.style.marginTop = '20px';
+            }
+
+            function crearIndices() {
+                DOM.indicesContenedor.innerHTML = Array.from(
+                    {length: estado.totalPreguntas},
+                    (_, i) => `<div class="indice-pregunta" data-index="${i}">${i+1}</div>`
+                ).join('');
+                indicesPreguntas = DOM.indicesContenedor.querySelectorAll('.indice-pregunta');
+            }
+
+            function manejarClickIndice(event) {
+                const indice = event.target.closest('.indice-pregunta');
+                if (indice) {
+                    estado.preguntaActual = parseInt(indice.dataset.index);
+                    mostrarPregunta();
+                }
+            }
+
+            function actualizarResumen() {
+                indicesPreguntas.forEach((indice, index) => {
+                    toggleClasses(indice, null, ['correcta', 'incorrecta']);
+                    const pregunta = preguntas[index];
+                    if (pregunta.comprobada) {
+                        if (pregunta.esCorrecta) {
+                            toggleClasses(indice, 'correcta');
+                        } else {
+                            toggleClasses(indice, 'incorrecta');
+                        }
+                    }
+                });
+            }
+
+            function toggleFinalizarTest() {
+                if (DOM.resultadosFinales.classList.contains('hidden')) {
+                    mostrarResultados();
+                } else {
+                    mostrarPregunta();
+                }
+            }
+            
+
+            function cacheElements() {
+                return {
+                    preguntaTexto: document.getElementById('pregunta-texto'),
+                    opcionesContenedor: document.getElementById('opciones-contenedor'),
+                    siguienteBtn: document.getElementById('siguiente-btn'),
+                    volverBtn: document.getElementById('volver-btn'),
+                    comprobarBtn: document.getElementById('comprobar-btn'),
+                    indicesContenedor: document.getElementById('indices-contenedor'),
+                    contenedorTest: document.querySelector('section.contenedor-test'),
+                    rectanguloResumen: document.querySelector('footer.rectangulo-resumen'),
+                    modalOverlay: document.getElementById('custom-modal-overlay'),
+                    modalMessage: document.getElementById('custom-modal-message'),
+                    modalOkBtn: document.getElementById('custom-modal-ok'),
+                    contenidoPregunta: document.getElementById('contenido-pregunta'),
+                    resultadosFinales: document.getElementById('resultados-finales'),
+                    resultadosTexto: document.getElementById('resultados-texto'),
+                    finalizarBtn: document.getElementById('finalizar-btn')
+                };
+            }
+
+            function initData() {
+                const labels = ['a) ', 'b) ', 'c) ', 'd) '];
+                preguntas.forEach(p => {
+                    if (p.options && p.options.length > 0 && typeof p.correct === 'number' && p.correct < p.options.length) {
+                        const correctAnswerText = p.options[p.correct].substring(3).trim();
+                        let answerTexts = p.options.map(opt => opt.substring(3).trim());
+                        
+                        for (let i = answerTexts.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [answerTexts[i], answerTexts[j]] = [answerTexts[j], answerTexts[i]];
+                        }
+                        
+                        p.options = answerTexts.map((text, index) => labels[index] + text);
+                        const newCorrectIndex = answerTexts.findIndex(text => text === correctAnswerText);
+                        
+                        if (newCorrectIndex !== -1) {
+                           p.correct = newCorrectIndex;
+                        }
+                    }
+                });
+
+                shuffleArray(preguntas);
+                preguntas = preguntas.map(p => ({
+                    ...p,
+                    respuestaUsuario: null,
+                    comprobada: false,
+                    esCorrecta: false
+                }));
+
+                const fragmentoOpciones = document.createDocumentFragment();
+                for (let i = 0; i < 4; i++) {
+                    const boton = document.createElement('button');
+                    boton.className = 'opcion';
+                    boton.dataset.index = i;
+                    fragmentoOpciones.appendChild(boton);
+                }
+                DOM.opcionesContenedor.appendChild(fragmentoOpciones);
+
+                botonesOpciones = Array.from(DOM.opcionesContenedor.querySelectorAll('.opcion'));
+
+                crearIndices();
+            }
+
+            function setupEvents() {
+                DOM.contenedorTest.addEventListener('click', (event) => {
+                    const target = event.target;
+                    if (target.id === 'siguiente-btn') {
+                        siguientePregunta();
+                    } else if (target.id === 'volver-btn') {
+                        volverPregunta();
+                    } else if (target.id === 'comprobar-btn') {
+                        comprobarRespuesta();
+                    } else if (target.classList.contains('opcion')) {
+                        manejarSeleccion(event);
+                    }
+                });
+
+                DOM.rectanguloResumen.addEventListener('click', (event) => {
+                    const target = event.target;
+                    if (target.id === 'finalizar-btn') {
+                        toggleFinalizarTest();
+                    } else if (target.classList.contains('indice-pregunta')) {
+                        manejarClickIndice(event);
+                    }
+                });
+
+                DOM.modalOkBtn.addEventListener('click', ocultarModal);
+                
+            }
+
+            function init() {
+                DOM = cacheElements();
+                initData();
+                setupEvents();
+                mostrarPregunta();
+            }
+
+            init();
+        });
+    </script>
+</body>
+</html>

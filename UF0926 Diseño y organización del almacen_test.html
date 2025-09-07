@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UF0926 Diseño y organización del almacén</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #F0F0F0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .contenedor-principal {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            padding: 20px;
+            z-index: 1;
+        }
+
+        section.contenedor-test, footer.rectangulo-resumen {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 800px;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .titulo-test {
+            font-size: 24px;
+            font-weight: bold;
+            color: #6c757d;
+            margin: 0 0 20px 0;
+            text-align: center;
+        }
+
+        .pregunta {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: left;
+        }
+        .opciones-contenedor {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .opcion {
+            background-color: #e9ecef;
+            border: 2px solid #e9ecef;
+            color: #495057;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s, border-color 0.2s;
+            text-align: left;
+        }
+        .opcion:hover {
+            background-color: #dee2e6;
+        }
+        .opcion.seleccionada {
+            background-color: #cce5ff;
+            border-color: #cce5ff;
+            color: #004085;
+        }
+        .opcion.correcta {
+            background-color: #85d192;
+            border-color: #85d192;
+            color: #155724;
+            cursor: default;
+        }
+        .opcion.incorrecta {
+            background-color: #f0a1a8;
+            border-color: #f0a1a8;
+            color: #721c24;
+            cursor: default;
+        }
+        .opcion.correcta:hover, .opcion.incorrecta:hover {
+            background-color: #85d192;
+            color: #155724;
+            border-color: #85d192;
+        }
+        .opcion.incorrecta:hover {
+            background-color: #f0a1a8;
+            color: #721c24;
+            border-color: #f0a1a8;
+        }
+        .navegacion-btn-contenedor {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .comprobar-btn, #finalizar-btn, #volver-menu-btn {
+            background-color: #cce5ff;
+            color: #004085;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .comprobar-btn:hover, #finalizar-btn:hover, #volver-menu-btn:hover {
+            background-color: #b3d7ff;
+        }
+        .hidden {
+            display: none;
+        }
+
+        .navegacion-btn {
+            background-color: #E0E0E0;
+            color: #555;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .navegacion-btn:hover {
+            background-color: #CFCFCF;
+        }
+        .navegacion-btn:disabled {
+            background-color: #f1f1f1;
+            color: #aaa;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        footer.rectangulo-resumen {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 800px;
+            margin-top: 20px;
+            overflow-y: auto;
+        }
+        .indices-contenedor {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .indice-pregunta {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            color: #495057;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .indice-pregunta.activa {
+            background-color: #cce5ff;
+            color: #004085;
+            border: none;
+        }
+        .indice-pregunta:hover {
+            background-color: #dee2e6;
+        }
+        .indice-pregunta.correcta {
+            background-color: #85d192;
+            color: #155724;
+        }
+        .indice-pregunta.incorrecta {
+            background-color: #f0a1a8;
+            color: #495057;
+        }
+
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .custom-modal {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .custom-modal h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .custom-modal button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .resultados-finales-container {
+            text-align: center;
+        }
+        .resultados-finales-texto {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .resultados-finales-correctas {
+            color: #155724;
+            font-weight: bold;
+        }
+        .resultados-finales-incorrectas {
+            color: #721c24;
+            font-weight: bold;
+        }
+        .boton-volver-menu {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .boton-volver-menu:hover {
+            background-color: #45a049;
+        }
+
+        @media (max-width: 800px) {
+            section.contenedor-test, footer.rectangulo-resumen {
+                width: 95%;
+                padding: 15px;
+            }
+            .opcion {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="contenedor-principal">
+        <h1 class="titulo-test">UF0926 Diseño y organización del almacén</h1>
+        <section class="contenedor-test">
+            <article id="contenido-pregunta">
+                <div class="pregunta" id="pregunta-texto"></div>
+                <div class="opciones-contenedor" id="opciones-contenedor"></div>
+                <div class="navegacion-btn-contenedor">
+                    <button id="volver-btn" class="navegacion-btn">Anterior</button>
+                    <button id="comprobar-btn" class="comprobar-btn">Comprobar</button>
+                    <button id="siguiente-btn" class="navegacion-btn">Siguiente</button>
+                </div>
+            </article>
+            <div id="resultados-finales" class="hidden resultados-finales-container">
+                <h2>Resultados Finales</h2>
+                <div id="resultados-texto" class="resultados-finales-texto"></div>
+                <button id="volver-menu-btn" class="boton-volver-menu">Volver al menú principal</button>
+            </div>
+        </section>
+        <footer class="rectangulo-resumen" id="rectangulo-resumen">
+            <div class="indices-contenedor" id="indices-contenedor"></div>
+            <button id="finalizar-btn" class="comprobar-btn" style="width: 100%; margin-top: 20px;">Finalizar Test</button>
+        </footer>
+    </div>
+
+    <div id="custom-modal-overlay" class="custom-modal-overlay hidden">
+        <div class="custom-modal">
+            <p id="custom-modal-message"></p>
+            <button id="custom-modal-ok">Aceptar</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let preguntas = [
+  {
+    "question": "1. En el proceso de recepción la primera actividad es:",
+    "options": [
+      "a) Clasificación",
+      "b) Verificación de documentos",
+      "c) Llegada de la mercancía al muelle de descarga",
+      "d) Paletización"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "2. El picking es:",
+    "options": [
+      "a) Extracción de la mercancía de su lugar de almacén y traslado a donde se preparará el pedido",
+      "b) Verificar la mercancía antes de preparar el pedido",
+      "c) Informatización de la mercancía antes de preparar el pedido",
+      "d) Transporte al cliente del pedido"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "3. El sistema Pick To Voice es:",
+    "options": [
+      "a) Sistema que te dirige a la mercancía encendiéndose una lámpara",
+      "b) Sistema que te guía mediante instrucciones de voz",
+      "c) Sistema que te guía informáticamente",
+      "d) Un operario te guía personalmente a la mercancía"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "4. La productividad es el cociente de dos ratios:",
+    "options": [
+      "a) Coste horario de los recursos y coste de los materiales",
+      "b) Número de unidades expedidas y coste del almacén",
+      "c) Personal y efectividad",
+      "d) Costes de manutención y costes de personal"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "5. El lay out es:",
+    "options": [
+      "a) Término inglés que significa ley y orden",
+      "b) Término inglés con el que se denomina al almacén",
+      "c) Término inglés para nominar una mercancía y su distribución",
+      "d) Término inglés que significa plan o disposición se utiliza para nombrar el esquema de distribución de los elementos dentro de un diseño"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "6. Los almacenes centrales son aquellos que:",
+    "options": [
+      "a) Tienen los productos que se venden a una zona geográfica (país o mundo entero)",
+      "b) Tienen los productos que no se venden",
+      "c) Contienen los productos desechados",
+      "d) Tiene los productos que se venden en la región"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "7. El sistema de almacenaje según el flujo de mercancías llamado FIFO consiste en:",
+    "options": [
+      "a) La mercancía que primero entra es la última en salir",
+      "b) La mercancía que primero entra es la primera en salir",
+      "c) La que primero caduca es la primera en salir",
+      "d) La que primero caduca es la última en salir"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "8. La pyme se identifica por contar con:",
+    "options": [
+      "a) Más de 250 trabajadores",
+      "b) El mismo número de trabajadores que una gran empresa",
+      "c) No importa el número de trabadores",
+      "d) Menos de 250 trabajadores"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "9. La pasteurización es:",
+    "options": [
+      "a) Técnica para conservar productos perecederos",
+      "b) Técnica para conservar productos no perecederos",
+      "c) Técnica utilizada para productos peligrosos",
+      "d) Técnica de almacenamiento de productos en el almacén"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "10. Es muy importante mejorar la productividad para mejorar la empresa. Esta mejora da lugar a:",
+    "options": [
+      "a) Mejorarán los sueldos y la rentabilidad de la inversión",
+      "b) Mejorará la gestión del transporte",
+      "c) Mejorarán las infraestructuras",
+      "d) Mejorará la maquinaria"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "11. ¿Cuál de los siguientes tipos de almacén, en función de su manipulación, se caracteriza en que no dispone de pasillos?",
+    "options": [
+      "a) Móvil",
+      "b) Compacto",
+      "c) En bloque",
+      "d) Autoportante"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "12. ¿Cuál de los siguientes tipos de almacén, en función de su manipulación, se conoce también como de producto a operador?",
+    "options": [
+      "a) Dinámico",
+      "b) Móvil",
+      "c) De estanterías convencionales",
+      "d) En bloque"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "13. En el almacenaje siguiendo el criterio de entrada-salida de mercancías, ¿en qué tipo el producto que entró el último es el primero en salir?",
+    "options": [
+      "a) LIFO",
+      "b) NIFO",
+      "c) FEFO",
+      "d) FIFO"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "14. ¿Cuál de los siguientes no es un criterio para la zonificación de mercancías?",
+    "options": [
+      "a) Familias",
+      "b) Mercancía- proveedor",
+      "c) Clasificación ABC",
+      "d) Familia - rotación"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "15. ¿Cuál de las siguientes ventajas no es aplicable a los ERP en la empresa?",
+    "options": [
+      "a) Es una herramienta con un bajo coste de implementación",
+      "b) Optimiza los tiempos de producción",
+      "c) Gestiona en tiempo real la información",
+      "d) Es una ventaja competitiva"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "16. ¿Cuál de las siguientes no es una fase de la gestión de los riesgos informáticos?",
+    "options": [
+      "a) Evolución",
+      "b) Control",
+      "c) Clasificación",
+      "d) Análisis"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "17. ¿Cuál de las siguientes es un indicador de gestión del almacén asociado al tiempo?",
+    "options": [
+      "a) Tiempo de rack",
+      "b) Tiempo de surtido",
+      "c) Tiempo de manutención",
+      "d) Tiempo de salida"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "18. ¿Cuál es la principal característica del picking to light?",
+    "options": [
+      "a) El apoyo a la preparación de pedidos mediante guías de luz",
+      "b) El apoyo a la preparación de pedidos mediante display",
+      "c) El apoyo a la preparación de pedidos mediante tags",
+      "d) El apoyo a la preparación de pedidos mediante radiofrecuencia"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "19. ¿Cuál de los siguientes tipos de almacén, en función de su manipulación, coloca la carga bajo el principio de hueco vacío?",
+    "options": [
+      "a) Móvil",
+      "b) De estanterías convencionales",
+      "c) En bloque",
+      "d) Autoportante"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "20. ¿Cuál de los siguientes no es una salvaguarda o tecnología habitual contra las amenazas informáticas?",
+    "options": [
+      "a) Cifrado",
+      "b) Telemetría",
+      "c) Firma digital",
+      "d) Cortafuegos"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "21. El palet es el soporte de carga más utilizado, ¿cuál de las siguientes no es una característica del palet en cuanto a su resistencia?",
+    "options": [
+      "a) Compresión",
+      "b) Flexión",
+      "c) Torsión",
+      "d) Impactos"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "22. ¿Cuál de los siguientes, no es un sistema de gestión de palets?",
+    "options": [
+      "a) Gestión conjunta",
+      "b) Sistema pool",
+      "c) Gestión individual",
+      "d) Sistema put-back"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "23. ¿Cuál de los siguientes equipos de manutención permite la elevación de la carga y cierto movimiento giratorio para facilitar su manipulación?",
+    "options": [
+      "a) Apilador eléctrico",
+      "b) Carretilla retráctil",
+      "c) Transpaleta eléctrica",
+      "d) Recogepedidos de alto nivel"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "24. Dentro de la maquinaría disponible para la preparación de pedidos en el almacén, la enfardadora:",
+    "options": [
+      "a) Forma las cajas dejándolas preparadas para introducir la mercancía",
+      "b) Embalan la mercancía con un plástico a alta temperatura",
+      "c) Sellan y precintan las uniones de los bultos",
+      "d) Recubren los lados del palet con un plástico estirable"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "25. ¿Cuál es una de las principales diferencias del diseño de la instalación de estanterías?",
+    "options": [
+      "a) El peso de la mercancía",
+      "b) El precio de la mercancía",
+      "c) El índice de rotación",
+      "d) Obsolescencia"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "26. ¿Cuál es un tipo de almacenamiento en estantería y estructuras portantes?",
+    "options": [
+      "a) Estático",
+      "b) Controlado",
+      "c) Temporal",
+      "d) Autoportante"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "27. ¿Qué son los carruseles horizontales?",
+    "options": [
+      "a) Estructuras para cargas pequeñas dispuestas en un módulo común",
+      "b) Estructuras en módulos parcialmente conectados",
+      "c) Estructuras para cargas grandes dispuestas en módulos independientes",
+      "d) Estructuras para cargas pequeñas dispuestas en módulos independientes"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "28. ¿Qué es el magalift?",
+    "options": [
+      "a) Sistema de almacenaje automático vertical",
+      "b) Sistemas de almacenaje manual",
+      "c) Sistemas de almacenaje para cargas unitarias",
+      "d) Sistemas de estanterías retráctiles"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "29. ¿Cuál no es un tipo de mantenimiento?",
+    "options": [
+      "a) Mantenimiento preventivo",
+      "b) Mantenimiento correctivo",
+      "c) Mantenimiento predictivo",
+      "d) Mantenimiento sustitutivo"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "30. ¿Cuál es uno de los principales componentes del coste de mantenimiento?",
+    "options": [
+      "a) Edificio",
+      "b) Materiales de repuesto",
+      "c) Recursos informáticos",
+      "d) Muelles de carga"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "31. El presupuesto de inversiones se estructura en:",
+    "options": [
+      "a) Espacio y manipulación",
+      "b) Espacio y personal",
+      "c) Espacio y distribución",
+      "d) Administración y personal"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "32. El fondo de amortización es:",
+    "options": [
+      "a) Fondo que se crea para inversión inicial de elementos patrimoniales",
+      "b) Fondo que se crea para cubrir gastos",
+      "c) Fondo que se crea para compensar la depreciación de ciertos elementos patrimoniales",
+      "d) Fondo que se crea para mantenimiento de ciertos elementos patrimoniales"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "33. La productividad es:",
+    "options": [
+      "a) El resultado del esfuerzo del hombre y no de una maquinaria nueva y más efectiva",
+      "b) El resultado de tener máquinas más nuevas y efectivas",
+      "c) El resultado del mantenimiento de la maquinaria",
+      "d) El resultado de la administración del almacén"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "34. Los costes de almacenaje son:",
+    "options": [
+      "a) Costes producidos por la realización de pedidos",
+      "b) Costes producidos por tener mercancías almacenadas",
+      "c) Costes producidos por transportar pedidos",
+      "d) Costes producidos por el mantenimiento de la maquinaria"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "35. Los costes de ventas son:",
+    "options": [
+      "a) Los causados por las actividades para poner el producto al alcance de los consumidores",
+      "b) Los causados por las actividades del personal del almacén",
+      "c) Los causados por las actividades de fabricación de un producto",
+      "d) Los causados por actividades de manutención de la maquinaria"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "36. El presupuesto operativo es:",
+    "options": [
+      "a) El documento que refleja los costes que el almacén espera tener en un periodo de tiempo, generalmente, un año",
+      "b) El documento que recoge los gastos del año anterior",
+      "c) Documento que recoge todos los gastos del almacén",
+      "d) Documento que recoge el presupuesto de la inversión en maquinaria"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "37. El coste unitario es:",
+    "options": [
+      "a) El presupuesto / personal",
+      "b) El presupuesto / las unidades del almacén",
+      "c) El presupuesto / el personal + unidades del almacén",
+      "d) El presupuesto / cantidad anual de unidades"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "38. En relación a la actividad, los costos fijos son los que:",
+    "options": [
+      "a) Varían conforme a los cambios de volúmenes de la actividad",
+      "b) No varían conforme a los cambios de volúmenes de la actividad",
+      "c) Varían al variar el volumen, pero no lo hacen proporcionalmente",
+      "d) Incluyen elementos fijos y variables"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "39. El cálculo del presupuesto anual se integra por dos áreas:",
+    "options": [
+      "a) Presupuesto operativo y presupuesto financiero",
+      "b) Presupuesto de carga y descarga",
+      "c) Presupuesto logístico y administrativo",
+      "d) Presupuesto de transportes y manutención"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "40. Entre las variables macro económicas señalamos:",
+    "options": [
+      "a) Estrategias de precios",
+      "b) Liquidez",
+      "c) Crecimiento del PIB al que pertenece la empresa",
+      "d) Capital de trabajo"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "41. ¿Cuál es el proceso, por medio de la observación, mediciones, ensayos y pruebas, para la evaluación de las no conformidades?",
+    "options": [
+      "a) Control de calidad",
+      "b) Aseguramiento de calidad",
+      "c) Inspección de calidad",
+      "d) Gestión de la calidad total"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "42. ¿Cuál es el indicador que mide la fiabilidad de los proveedores en sus entregas?",
+    "options": [
+      "a) Nivel de servicio",
+      "b) Seguridad en el suministro",
+      "c) Fiabilidad de existencias",
+      "d) Roturas de stock"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "43. ¿Cuál es el organismo español encargado de la normalización y certificación de las empresas en lo referente a calidad?",
+    "options": [
+      "a) AENOR",
+      "b) ENAC",
+      "c) CEN",
+      "d) ETSI"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "44. ¿Cuál es el modelo de gestión de calidad en el que la empresa evalúa internamente sus procesos para alcanzar la excelencia?",
+    "options": [
+      "a) EFQM",
+      "b) MIEG",
+      "c) ISO 9000",
+      "d) DEMING"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "45. ¿Cuál es la norma que especifica los requisitos aplicables de calidad con el objetivo de aumentar la satisfacción de los clientes?",
+    "options": [
+      "a) ISO 19011",
+      "b) ISO 9001",
+      "c) ISO 9004",
+      "d) ISO 10 012"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "46. ¿Cuál es el término que define la Norma ISO del año 2015 como el conjunto de actividades que transforman elementos de entrada en resultados, consumiendo recursos?",
+    "options": [
+      "a) Función",
+      "b) Operación",
+      "c) Proceso",
+      "d) Tarea"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "47. ¿Cuál de las siguientes acciones no está encaminada a la mejora continua en la empresa?",
+    "options": [
+      "a) Política de calidad",
+      "b) Análisis de los resultados de las auditorías",
+      "c) Análisis de estudios financieros",
+      "d) Las acciones correctivas"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "48. ¿Cuál es la herramienta fundamental para la formación de personal en cuestiones de calidad?",
+    "options": [
+      "a) Capacitación",
+      "b) Actualización",
+      "c) Integración",
+      "d) Educación"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "49. ¿Cuál es el documento principal para la implantación y seguimiento del sistema de gestión de calidad?",
+    "options": [
+      "a) Procedimiento de trabajo",
+      "b) Manual de trabajo",
+      "c) Manual de calidad",
+      "d) El Registro de calidad"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "50. ¿Cuál es el responsable de la empresa encargado de gestionar las incidencias relacionadas con los materiales?",
+    "options": [
+      "a) Responsable del departamento comercial",
+      "b) Responsable del control de calidad",
+      "c) Responsable de almacén",
+      "d) Responsable de administración"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "51. ¿Qué actividades se producen en el proceso de recepción?",
+    "options": [
+      "a) Descarga de la mercancía",
+      "b) Todas las anteriores",
+      "c) La mercancía llega al muelle de descarga",
+      "d) Verificación de los documentos"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "52. ¿Qué actividades no se desarrollan en el proceso de almacenaje?",
+    "options": [
+      "a) Colocar los productos en los alojamientos seleccionados",
+      "b) Verificar que se cumple con las marcas gráficas",
+      "c) Controlar las fechas de vencimiento de los productos",
+      "d) Traslado de la mercancía en camión hasta el cliente"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "53. ¿Cuál de las siguientes no es un beneficio del Cross Docking?",
+    "options": [
+      "a) Mejora la disponibilidad de los productos",
+      "b) Aumenta la vida útil del producto",
+      "c) Aumento de los tiempos de entrega al cliente",
+      "d) Minimiza los costes de distribución"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "54. ¿Cuáles son los objetivos en el diseño del almacén?",
+    "options": [
+      "a) Se establece los presupuestos e inversiones",
+      "b) Determinar la manera de operar en el almacén",
+      "c) Todas las anteriores",
+      "d) Se establece responsabilidades de las personas y su organización"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "55. ¿Cuál no es un tipo de almacén?",
+    "options": [
+      "a) Almacén en línea",
+      "b) Almacén en bloque",
+      "c) Almacén de estanterías",
+      "d) Almacén compacto"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "56. ¿Cuál es un método de almacenaje habitual?",
+    "options": [
+      "a) Todas las demás",
+      "b) Método FIFO",
+      "c) Método NIFO",
+      "d) Método FEFO"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "57. ¿Cuál es uno de los aspectos a la hora de zonificar los espacios en el almacén?",
+    "options": [
+      "a) Características del almacén",
+      "b) Todas las anteriores",
+      "c) Características del sistema informático",
+      "d) Características del personal"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "58. ¿Cuál es el sistema de preparación de pedidos que guía al operario visualmente hasta la ubicación exacta de la mercancía?",
+    "options": [
+      "a) Pick to light",
+      "b) Rack to light",
+      "c) Pick to voice",
+      "d) Termofrecuencia"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "59. ¿Cuál es el principal elemento usado en los almacenes para el soporte de cargas?",
+    "options": [
+      "a) Apilador",
+      "b) Rampas niveladoras",
+      "c) contenedor de manutención",
+      "d) Palet"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "60. ¿Cuál es una de las ventajas del uso de palets?",
+    "options": [
+      "a) Todas las anteriores",
+      "b) Se simplifica la identificación de las mercancías",
+      "c) Los productos paletizados se recuentan con facilidad",
+      "d) Se reducen los tiempos de carga y descarga"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "61. ¿Cuál de los siguientes apartados no es una desventaja de los carruseles?",
+    "options": [
+      "a) Carga y descarga por la misma zona",
+      "b) Coste muy bajo",
+      "c) Dificultades en caso de avería",
+      "d) Modificaciones complejas"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "62. ¿Qué ventaja existe en la contratación de personal externo de mantenimiento?",
+    "options": [
+      "a) Todas las anteriores",
+      "b) El tiempo de resolución de averías es menor",
+      "c) Es posible disponer de operarios especialmente cualificados con más experiencia",
+      "d) Se elimina la problemática de gestión de recursos humanos de personal propio"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "63. ¿Qué supone la decisión de inversión?",
+    "options": [
+      "a) Compromiso de una serie de recursos actuales",
+      "b) Una nueva metodología",
+      "c) No supone ningún compromiso, solo una decisión",
+      "d) Todas las anteriores"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "64. ¿Cuáles son algunos de los factores que influyen en el coste de manipulación?",
+    "options": [
+      "a) Todas las anteriores",
+      "b) Embalajes",
+      "c) Tamaño del producto",
+      "d) Transporte de mercancías"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "65. ¿Cuál no es un aspecto para que el cliente perciba que el almacén trabaja con calidad?",
+    "options": [
+      "a) La capacidad de anticipación ante los problemas que surjan",
+      "b) Rapidez en la resolución de incidencias",
+      "c) La atención que recibe",
+      "d) La competitividad de la organización"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "66. ¿Cuál es alguna característica del sistema de calidad total?",
+    "options": [
+      "a) Generar satisfacción al cliente",
+      "b) Cooperación",
+      "c) Objetivos estratégicos ligados a los procesos",
+      "d) Todas las demás"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "67. ¿Cuál no es una de las posibilidades de cálculo del nivel de servicio?",
+    "options": [
+      "a) Por valor",
+      "b) Por unidades",
+      "c) Por pedidos",
+      "d) Por tiempo"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "68. ¿Cuál no es una variable a tener en cuenta en el ambiente de trabajo?",
+    "options": [
+      "a) Interacción social",
+      "b) Instalaciones para el personal de la organización",
+      "c) Material de oficina",
+      "d) Ubicación del lugar de trabajo"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "69. ¿Sobre qué debe aportar información el análisis de datos?",
+    "options": [
+      "a) Las características y tendencia de los procesos y de los productos",
+      "b) Satisfacción del cliente",
+      "c) La conformidad con los requisitos del producto",
+      "d) Todas las anteriores"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "70. ¿A qué se denomina Función comercial?",
+    "options": [
+      "a) Es el apoyo técnico recibido",
+      "b) Es el trato no técnico que el cliente recibe de la empresa",
+      "c) Es la resolución de una reclamación de un cliente",
+      "d) Es el asesoramiento financiero que recibe el cliente"
+    ],
+    "correct": 1
+  }
+];
+            let DOM = {};
+
+            const estado = {
+                preguntaActual: 0,
+                respuestasCorrectas: 0,
+                respuestasIncorrectas: 0,
+                totalPreguntas: preguntas.length
+            };
+
+            let botonesOpciones;
+            let indicesPreguntas;
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            function toggleClasses(element, addClass, removeClasses) {
+                if (removeClasses && removeClasses.length > 0) {
+                    removeClasses.forEach(cls => element.classList.remove(cls));
+                }
+                if (addClass) {
+                    element.classList.add(addClass);
+                }
+            }
+
+            function mostrarModal(message) {
+                DOM.modalMessage.textContent = message;
+                DOM.modalOverlay.classList.remove('hidden');
+            }
+
+            function ocultarModal() {
+                DOM.modalOverlay.classList.add('hidden');
+            }
+
+            function marcarRespuesta(index) {
+                const pregunta = preguntas[index];
+
+                const botonCorrecto = botonesOpciones[pregunta.correct];
+                const indiceCorrecto = indicesPreguntas[index];
+
+                toggleClasses(indiceCorrecto, null, ['correcta', 'incorrecta']);
+
+                if (pregunta.respuestaUsuario !== null) {
+                    toggleClasses(botonCorrecto, 'correcta');
+
+                    if (pregunta.esCorrecta) {
+                        toggleClasses(indiceCorrecto, 'correcta');
+                    } else {
+                        const botonSeleccionado = botonesOpciones[pregunta.respuestaUsuario];
+                        toggleClasses(botonSeleccionado, 'incorrecta');
+                        toggleClasses(indiceCorrecto, 'incorrecta');
+                    }
+                }
+            }
+
+            function mostrarPregunta() {
+                const { preguntaActual, totalPreguntas } = estado;
+                DOM.resultadosFinales.classList.add('hidden');
+                DOM.contenidoPregunta.classList.remove('hidden');
+                DOM.rectanguloResumen.classList.remove('hidden');
+                DOM.finalizarBtn.textContent = 'Finalizar Test';
+
+                const pregunta = preguntas[preguntaActual];
+                const cleanedQuestion = pregunta.question.replace(/^\s*(\d+\.\s*)+/, '');
+                DOM.preguntaTexto.textContent = `${preguntaActual + 1}. ${cleanedQuestion}`;
+
+                botonesOpciones.forEach((boton, index) => {
+                    toggleClasses(boton, null, ['seleccionada', 'correcta', 'incorrecta']);
+                    boton.textContent = pregunta.options[index];
+                    boton.disabled = pregunta.comprobada;
+                });
+
+                if (pregunta.respuestaUsuario !== null) {
+                    toggleClasses(botonesOpciones[pregunta.respuestaUsuario], 'seleccionada');
+                    if (pregunta.comprobada) {
+                        marcarRespuesta(preguntaActual);
+                    }
+                }
+
+                if (indicesPreguntas) {
+                    indicesPreguntas.forEach(indice => indice.classList.remove('activa'));
+                    indicesPreguntas[preguntaActual].classList.add('activa');
+                }
+
+                DOM.comprobarBtn.classList.toggle('hidden', pregunta.comprobada);
+                actualizarEstadoBotones();
+            }
+
+            function manejarSeleccion(event) {
+                const boton = event.target.closest('.opcion');
+                if (boton) {
+                    const pregunta = preguntas[estado.preguntaActual];
+                    if (!pregunta.comprobada) {
+                        botonesOpciones.forEach(b => toggleClasses(b, null, ['seleccionada']));
+                        toggleClasses(boton, 'seleccionada');
+                    }
+                }
+            }
+
+            function comprobarRespuesta() {
+                const respuestaSeleccionadaActual = DOM.opcionesContenedor.querySelector('.opcion.seleccionada');
+                if (!respuestaSeleccionadaActual) {
+                    mostrarModal('Por favor, selecciona una respuesta antes de comprobar.');
+                    return;
+                }
+                const { preguntaActual } = estado;
+                const pregunta = preguntas[preguntaActual];
+                const respuestaIndex = parseInt(respuestaSeleccionadaActual.dataset.index);
+
+                pregunta.respuestaUsuario = respuestaIndex;
+                pregunta.comprobada = true;
+                pregunta.esCorrecta = (respuestaIndex === pregunta.correct);
+
+                if (pregunta.esCorrecta) {
+                    estado.respuestasCorrectas++;
+                } else {
+                    estado.respuestasIncorrectas++;
+                }
+
+                marcarRespuesta(preguntaActual);
+                actualizarResumen();
+
+                botonesOpciones.forEach(boton => boton.disabled = true);
+                DOM.comprobarBtn.classList.add('hidden');
+            }
+
+            function actualizarEstadoBotones() {
+                const { preguntaActual, totalPreguntas } = estado;
+                const esUltimaPregunta = preguntaActual === totalPreguntas - 1;
+                DOM.volverBtn.disabled = preguntaActual === 0;
+                DOM.siguienteBtn.textContent = esUltimaPregunta ? 'Terminar' : 'Siguiente';
+            }
+
+            function siguientePregunta() {
+                const { preguntaActual, totalPreguntas } = estado;
+                if (preguntaActual < totalPreguntas - 1) {
+                    estado.preguntaActual++;
+                    mostrarPregunta();
+                } else {
+                    mostrarResultados();
+                }
+            }
+
+            function volverPregunta() {
+                const { preguntaActual } = estado;
+                if (preguntaActual > 0) {
+                    estado.preguntaActual--;
+                    mostrarPregunta();
+                }
+            }
+
+            function mostrarResultados() {
+                const { respuestasCorrectas, respuestasIncorrectas } = estado;
+                DOM.contenidoPregunta.classList.add('hidden');
+                DOM.resultadosFinales.classList.remove('hidden');
+
+                const correctasSpan = `<span class="resultados-finales-correctas">Correctas: ${respuestasCorrectas}</span>`;
+                const incorrectasSpan = `<span class="resultados-finales-incorrectas">Incorrectas: ${respuestasIncorrectas}</span>`;
+                DOM.resultadosTexto.innerHTML = `${correctasSpan} | ${incorrectasSpan}`;
+
+                DOM.finalizarBtn.textContent = 'Volver al Test';
+                DOM.rectanguloResumen.style.marginTop = '20px';
+            }
+
+            function crearIndices() {
+                DOM.indicesContenedor.innerHTML = Array.from(
+                    {length: estado.totalPreguntas},
+                    (_, i) => `<div class="indice-pregunta" data-index="${i}">${i+1}</div>`
+                ).join('');
+                indicesPreguntas = DOM.indicesContenedor.querySelectorAll('.indice-pregunta');
+            }
+
+            function manejarClickIndice(event) {
+                const indice = event.target.closest('.indice-pregunta');
+                if (indice) {
+                    estado.preguntaActual = parseInt(indice.dataset.index);
+                    mostrarPregunta();
+                }
+            }
+
+            function actualizarResumen() {
+                indicesPreguntas.forEach((indice, index) => {
+                    toggleClasses(indice, null, ['correcta', 'incorrecta']);
+                    const pregunta = preguntas[index];
+                    if (pregunta.comprobada) {
+                        if (pregunta.esCorrecta) {
+                            toggleClasses(indice, 'correcta');
+                        } else {
+                            toggleClasses(indice, 'incorrecta');
+                        }
+                    }
+                });
+            }
+
+            function toggleFinalizarTest() {
+                if (DOM.resultadosFinales.classList.contains('hidden')) {
+                    mostrarResultados();
+                } else {
+                    mostrarPregunta();
+                }
+            }
+            
+            function volverAlMenuPrincipal() {
+                window.location.href = '../MF1014_3 - Organización de Almacenes.html';
+            }
+
+            function cacheElements() {
+                return {
+                    preguntaTexto: document.getElementById('pregunta-texto'),
+                    opcionesContenedor: document.getElementById('opciones-contenedor'),
+                    siguienteBtn: document.getElementById('siguiente-btn'),
+                    volverBtn: document.getElementById('volver-btn'),
+                    comprobarBtn: document.getElementById('comprobar-btn'),
+                    indicesContenedor: document.getElementById('indices-contenedor'),
+                    contenedorTest: document.querySelector('section.contenedor-test'),
+                    rectanguloResumen: document.querySelector('footer.rectangulo-resumen'),
+                    modalOverlay: document.getElementById('custom-modal-overlay'),
+                    modalMessage: document.getElementById('custom-modal-message'),
+                    modalOkBtn: document.getElementById('custom-modal-ok'),
+                    contenidoPregunta: document.getElementById('contenido-pregunta'),
+                    resultadosFinales: document.getElementById('resultados-finales'),
+                    resultadosTexto: document.getElementById('resultados-texto'),
+                    finalizarBtn: document.getElementById('finalizar-btn'),
+                    volverMenuBtn: document.getElementById('volver-menu-btn'),
+                };
+            }
+
+            function initData() {
+                shuffleArray(preguntas);
+                preguntas = preguntas.map(p => ({
+                    ...p,
+                    respuestaUsuario: null,
+                    comprobada: false,
+                    esCorrecta: false
+                }));
+
+                const fragmentoOpciones = document.createDocumentFragment();
+                for (let i = 0; i < 4; i++) {
+                    const boton = document.createElement('button');
+                    boton.className = 'opcion';
+                    boton.dataset.index = i;
+                    fragmentoOpciones.appendChild(boton);
+                }
+                DOM.opcionesContenedor.appendChild(fragmentoOpciones);
+
+                botonesOpciones = Array.from(DOM.opcionesContenedor.querySelectorAll('.opcion'));
+
+                crearIndices();
+            }
+
+            function setupEvents() {
+                DOM.contenedorTest.addEventListener('click', (event) => {
+                    const target = event.target;
+                    if (target.id === 'siguiente-btn') {
+                        siguientePregunta();
+                    } else if (target.id === 'volver-btn') {
+                        volverPregunta();
+                    } else if (target.id === 'comprobar-btn') {
+                        comprobarRespuesta();
+                    } else if (target.classList.contains('opcion')) {
+                        manejarSeleccion(event);
+                    }
+                });
+
+                DOM.rectanguloResumen.addEventListener('click', (event) => {
+                    const target = event.target;
+                    if (target.id === 'finalizar-btn') {
+                        toggleFinalizarTest();
+                    } else if (target.classList.contains('indice-pregunta')) {
+                        manejarClickIndice(event);
+                    }
+                });
+
+                DOM.modalOkBtn.addEventListener('click', ocultarModal);
+                DOM.volverMenuBtn.addEventListener('click', volverAlMenuPrincipal);
+            }
+
+            function init() {
+                DOM = cacheElements();
+                initData();
+                setupEvents();
+                mostrarPregunta();
+            }
+
+            init();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UF0928 Seguridad y prevención en los riesgos en el almacén</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #F0F0F0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .contenedor-principal {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            padding: 20px;
+            z-index: 1;
+        }
+
+        section.contenedor-test, footer.rectangulo-resumen {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 800px;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .contenedor-secundario {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .titulo-test {
+            font-size: 24px;
+            font-weight: bold;
+            color: #6c757d;
+            margin: 0 0 20px 0;
+            text-align: center;
+        }
+        
+        .pregunta {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: left;
+        }
+        .opciones-contenedor {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .opcion {
+            background-color: #e9ecef;
+            border: 2px solid #e9ecef;
+            color: #495057;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s, border-color 0.2s;
+            text-align: left;
+        }
+        .opcion:hover {
+            background-color: #dee2e6;
+        }
+        .opcion.seleccionada {
+            background-color: #cce5ff;
+            border-color: #cce5ff;
+            color: #004085;
+        }
+        .opcion.correcta {
+            background-color: #85d192;
+            border-color: #85d192;
+            color: #155724;
+            cursor: default;
+        }
+        .opcion.incorrecta {
+            background-color: #f0a1a8;
+            border-color: #f0a1a8;
+            color: #721c24;
+            cursor: default;
+        }
+        .opcion.correcta:hover, .opcion.incorrecta:hover {
+            background-color: #85d192;
+            color: #155724;
+            border-color: #85d192;
+        }
+        .opcion.incorrecta:hover {
+            background-color: #f0a1a8;
+            color: #721c24;
+            border-color: #f0a1a8;
+        }
+        .navegacion-btn-contenedor {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .comprobar-btn, #finalizar-btn, #volver-menu-btn {
+            background-color: #cce5ff;
+            color: #004085;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .comprobar-btn:hover, #finalizar-btn:hover, #volver-menu-btn:hover {
+            background-color: #b3d7ff;
+        }
+        .hidden {
+            display: none;
+        }
+
+        .navegacion-btn {
+            background-color: #E0E0E0;
+            color: #555;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .navegacion-btn:hover {
+            background-color: #CFCFCF;
+        }
+        .navegacion-btn:disabled {
+            background-color: #f1f1f1;
+            color: #aaa;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        footer.rectangulo-resumen {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 800px;
+            margin-top: 20px;
+            overflow-y: auto;
+        }
+        .indices-contenedor {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .indice-pregunta {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            color: #495057;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .indice-pregunta.activa {
+            background-color: #cce5ff;
+            color: #004085;
+            border: none;
+        }
+        .indice-pregunta:hover {
+            background-color: #dee2e6;
+        }
+        .indice-pregunta.correcta {
+            background-color: #85d192;
+            color: #155724;
+        }
+        .indice-pregunta.incorrecta {
+            background-color: #f0a1a8;
+            color: #495057;
+        }
+
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .custom-modal {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .custom-modal h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .custom-modal button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .resultados-finales-container {
+            text-align: center;
+        }
+        .resultados-finales-texto {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .resultados-finales-correctas {
+            color: #155724;
+            font-weight: bold;
+        }
+        .resultados-finales-incorrectas {
+            color: #721c24;
+            font-weight: bold;
+        }
+        .boton-volver-menu {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .boton-volver-menu:hover {
+            background-color: #45a049;
+        }
+
+        @media (max-width: 800px) {
+            section.contenedor-test, footer.rectangulo-resumen {
+                width: 95%;
+                padding: 15px;
+            }
+            .opcion {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="contenedor-principal">
+        <h1 class="titulo-test">UF0928 Seguridad y prevención en los riesgos en el almacén</h1>
+        <section class="contenedor-test">
+            <article id="contenido-pregunta">
+                <div class="pregunta" id="pregunta-texto"></div>
+                <div class="opciones-contenedor" id="opciones-contenedor"></div>
+                <div class="navegacion-btn-contenedor">
+                    <button id="volver-btn" class="navegacion-btn">Anterior</button>
+                    <button id="comprobar-btn" class="comprobar-btn">Comprobar</button>
+                    <button id="siguiente-btn" class="navegacion-btn">Siguiente</button>
+                </div>
+            </article>
+            <div id="resultados-finales" class="hidden resultados-finales-container">
+                <h2>Resultados Finales</h2>
+                <div id="resultados-texto" class="resultados-finales-texto"></div>
+                <button id="volver-menu-btn" class="boton-volver-menu">Volver al menú principal</button>
+            </div>
+        </section>
+        <footer class="rectangulo-resumen" id="rectangulo-resumen">
+            <div class="indices-contenedor" id="indices-contenedor"></div>
+            <button id="finalizar-btn" class="comprobar-btn" style="width: 100%; margin-top: 20px;">Finalizar Test</button>
+        </footer>
+    </div>
+
+    <div id="custom-modal-overlay" class="custom-modal-overlay hidden">
+        <div class="custom-modal">
+            <p id="custom-modal-message"></p>
+            <button id="custom-modal-ok">Aceptar</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let preguntas = [
+                {
+                    "question": "¿En qué ámbito se incluyen los equipos de trabajo y las instalaciones?",
+                    "options": [
+                        "a) En los factores de riesgo relativos al trabajo.",
+                        "b) En los factores de riesgo relativos al trabajador.",
+                        "c) En los factores de riesgo relativos al lugar de trabajo.",
+                        "d) En los factores de riesgo relativos al entorno de trabajo."
+                    ],
+                    "correct": 2
+                },
+                {
+                    "question": "¿Cuál de los siguientes es un principio básico de la acción preventiva?",
+                    "options": [
+                        "a) Adaptar el trabajo a la persona.",
+                        "b) Tener en cuenta la evolución de la técnica.",
+                        "c) Planificar la prevención.",
+                        "d) Planificar la prevención, adaptar el trabajo a la persona y tener en cuenta la evolución de la técnica."
+                    ],
+                    "correct": 3
+                },
+                {
+                    "question": "¿Cuál de las siguientes características corresponde a los equipos de protección individual?",
+                    "options": [
+                        "a) Son muy eficaces.",
+                        "b) Se anteponen a las protecciones colectivas.",
+                        "c) Deben ser portados o sujetados por el trabajador.",
+                        "d) Son cómodos."
+                    ],
+                    "correct": 2
+                },
+                {
+                    "question": "¿A qué categoría pertenecen los EPI cuyo diseño es complejo y cuya misión es proteger al usuario de todo peligro mortal o que pueda dañar gravemente y de forma irreversible su salud, sin que pueda ser descubierto a tiempo su efecto inmediato?",
+                    "options": [
+                        "a) Categoría 1.",
+                        "b) Categoría 2.",
+                        "c) Categoría 3.",
+                        "d) Categoría 4."
+                    ],
+                    "correct": 2
+                },
+                {
+                    "question": "¿Cuál de los siguientes EPI puede ser necesario utilizar en un almacén?",
+                    "options": [
+                        "a) Casco.",
+                        "b) Guantes.",
+                        "c) Calzado de seguridad.",
+                        "d) Cascos, guantes y calzado de seguridad."
+                    ],
+                    "correct": 3
+                },
+                {
+                    "question": "¿En qué tipo de emergencia será necesaria la evacuación de las personas de determinados sectores, incluyendo la totalidad del edificio en casos específicos?",
+                    "options": [
+                        "a) Conato de emergencia.",
+                        "b) Emergencia parcial.",
+                        "c) Emergencia general.",
+                        "d) Emergencia total."
+                    ],
+                    "correct": 2
+                },
+                {
+                    "question": "¿Cuál de los siguientes se considera un accidente de trabajo?",
+                    "options": [
+                        "a) Los producidos al ir y volver del trabajo.",
+                        "b) Los debidos a fuerza mayor extraña al trabajo.",
+                        "c) Los debidos a dolor o imprudencia temeraria del trabajador.",
+                        "d) La concurrencia de culpabilidad civil o criminal de otras personas."
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Según el R.D. 487/1997, de 14 de abril, ¿cuál es la carga máxima que debe levantar manualmente un hombre?",
+                    "options": [
+                        "a) 15 kg.",
+                        "b) 25 kg.",
+                        "c) 35 kg.",
+                        "d) 40 kg."
+                    ],
+                    "correct": 1
+                },
+                {
+                    "question": "¿Cuál de las siguientes opciones es un accidente común durante el desarrollo de las tareas de extracción y estiba de mercancía?",
+                    "options": [
+                        "a) Sobreesfuerzos.",
+                        "b) Pisadas sobre objetos.",
+                        "c) Caídas de personas.",
+                        "d) Sobreesfuerzos, pisadas de objetos y caídas de personas."
+                    ],
+                    "correct": 3
+                },
+                {
+                    "question": "¿Qué inclinación deben tener las franjas amarillas y negras que señalizan un desnivel?",
+                    "options": [
+                        "a) 30°",
+                        "b) 45°",
+                        "c) 60°.",
+                        "d) 75°."
+                    ],
+                    "correct": 1
+                },
+                {
+                    "question": "¿Cuál es el primer paso de la actividad preventiva?",
+                    "options": [
+                        "a) Identificar los factores de riesgo.",
+                        "b) Atenuar los factores de riesgos.",
+                        "c) Eliminar los factores de riesgo.",
+                        "d) Informar y formar a los trabajadores."
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "¿Qué actuación se debe llevar a cabo para evitar los factores de riesgo que conllevan los procesos que requieren movimientos repetitivos y posturas forzadas?",
+                    "options": [
+                        "a) Reducir el esfuerzo a realizar por los operarios.",
+                        "b) Disminuir la repetitividad de las tareas lo máximo posible.",
+                        "c) Evitar siempre toda postura forzada y posturas mantenidas en el tiempo.",
+                        "d) Reducir el esfuerzo a realizar por los operarios, disminuir la repetitividad de las tareas y evitar posturas forzadas y mantenidas en el tiempo."
+                    ],
+                    "correct": 3
+                },
+                {
+                    "question": "¿Cuál de los siguientes equipos permite desplazar cargas paletizadas y colocarlas en el lugar adecuado de forma apilada con una autonomía mayor?",
+                    "options": [
+                        "a) Las transpaletas.",
+                        "b) Las carretillas elevadoras.",
+                        "c) Los apiladores.",
+                        "d) Ninguna de las respuestas anteriores es correcta."
+                    ],
+                    "correct": 1
+                },
+                {
+                    "question": "¿Cuál de los siguientes es un riesgo asociado a la extracción, estiba y manejo de mercancías APQ?",
+                    "options": [
+                        "a) Lesiones o enfermedades producidas por el contacto o exposición a estas sustancias.",
+                        "b) Incendio o explosión.",
+                        "c) Lesiones o enfermedades producidas por el contacto o exposición a estas sustancias y por incendio o explosión.",
+                        "d) Contacto por recipientes metálicos."
+                    ],
+                    "correct": 2
+                },
+                {
+                    "question": "¿Con qué tipo de sustancias se pueden almacenar sustancias tóxicas?",
+                    "options": [
+                        "a) Con sustancias inflamables.",
+                        "b) Con sustancias explosivas.",
+                        "c) Con sustancias nocivas.",
+                        "d) Con sustancias comburentes."
+                    ],
+                    "correct": 2
+                },
+                {
+                    "question": "¿Qué es la prevención?",
+                    "options": [
+                        "a) Es el conjunto de actividades o medidas adoptadas o previstas en todas las fases de actividad de la empresa con el fin de evitar o disminuir los riesgos derivados del trabajo.",
+                        "b) Es la posibilidad de que un trabajador sufra un determinado daño derivado del trabajo.",
+                        "c) Es el conjunto de enfermedades, patologías o lesiones sufridas con motivo u ocasión del trabajo.",
+                        "d) Es aquel riesgo laboral que resulte probable racionalmente que se materialice en un futuro inmediato y pueda suponer un daño grave para la salud de los trabajadores."
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "¿Qué tipo de riesgo es la caída de objetos durante su manipulación?",
+                    "options": [
+                        "a) Es un riesgo de accidente.",
+                        "b) Es un riesgo que puede provocar enfermedades profesionales.",
+                        "c) Es un riesgo que puede provocar estrés.",
+                        "d) Es un riesgo que puede provocar insatisfacción."
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "¿Cuál es el Real Decreto que aprueba el Reglamento sobre clasificación, envasado y etiquetado de sustancias peligrosas?",
+                    "options": [
+                        "a) R.D. 656/2017, de 23 de junio.",
+                        "b) El R.D. 374/2001, de 6 de abril.",
+                        "c) El R.D. 487/1997, de 14 de abril.",
+                        "d) El R.D. 363/1995, de 10 de marzo."
+                    ],
+                    "correct": 3
+                },
+                {
+                    "question": "¿Cuántos artículos tiene la Ley de Prevención de Riesgos Laborales?",
+                    "options": [
+                        "a) 16.",
+                        "b) 39.",
+                        "c) 54.",
+                        "d) 68."
+                    ],
+                    "correct": 2
+                },
+                {
+                    "question": "¿Cuántos capítulos tiene el Reglamento de los Servicios de Prevención?",
+                    "options": [
+                        "a) Cinco.",
+                        "b) Siete.",
+                        "c) Once.",
+                        "d) Quince."
+                    ],
+                    "correct": 1
+                },
+                {
+                    "question": "¿A qué velocidad debe circular, como máximo, una carretilla elevadora motorizada cargada dentro de un almacén?",
+                    "options": [
+                        "a) 9,5 km/h.",
+                        "b) 10 km/h.",
+                        "c) 15 km/h.",
+                        "d) 20 km/h."
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "¿Qué tipo de avisador utilizan las carretillas elevadoras cuando van a circular marcha atrás?",
+                    "options": [
+                        "a) Acústico.",
+                        "b) Luminoso.",
+                        "c) Acústico y luminoso a la vez.",
+                        "d) Dinámico."
+                    ],
+                    "correct": 2
+                },
+                {
+                    "question": "¿Qué significa NTP?",
+                    "options": [
+                        "a) No Tiene Protección.",
+                        "b) Ninguna Técnica de Prevención.",
+                        "c) Norma Técnica de Prevención.",
+                        "d) Nota Técnica de Prevención."
+                    ],
+                    "correct": 3
+                },
+                {
+                    "question": "¿En qué etapa del proceso de diseño de un puesto de trabajo se diseña la configuración física más adecuada, se seleccionan los dispositivos técnicos necesarios y se definen los procedimientos de trabajo del trabajador?",
+                    "options": [
+                        "a) En el análisis del sistema.",
+                        "b) En la asignación de tareas.",
+                        "c) En la concreción del sistema.",
+                        "d) En la implementación."
+                    ],
+                    "correct": 2
+                },
+                {
+                    "question": "¿Cuándo se deben utilizar indicadores acústicos en los dispositivos de presentación de datos?",
+                    "options": [
+                        "a) Cuando la información es larga.",
+                        "b) Cuando la información es compleja.",
+                        "c) Cuando la información debe ir seguida de acciones inmediatas.",
+                        "d) Cuando la información se refiere a sucesos localizados."
+                    ],
+                    "correct": 2
+                },
+                {
+                    "question": "¿Qué tipo de mando de accionamiento ofrece una precisión mayor?",
+                    "options": [
+                        "a) La manivela.",
+                        "b) El volante.",
+                        "c) El pedal.",
+                        "d) El pulsador."
+                    ],
+                    "correct": 1
+                },
+                {
+                    "question": "¿Qué tipo de carga va asociada a tareas que suponen niveles de tensión, conflicto e incertidumbre constantes en la toma de decisiones importantes?",
+                    "options": [
+                        "a) La carga física.",
+                        "b) La carga cognitiva.",
+                        "c) La carga psíquica.",
+                        "d) La carga social."
+                    ],
+                    "correct": 2
+                },
+                {
+                    "question": "¿A qué ámbito afecta la sintomatología del síndrome burnout?",
+                    "options": [
+                        "a) Al ámbito cognitivo.",
+                        "b) Al ámbito somático.",
+                        "c) Al ámbito emocional.",
+                        "d) Al ámbito cognitivo, somático y emocional."
+                    ],
+                    "correct": 3
+                },
+                {
+                    "question": "¿Cómo se debe levantar una carga?",
+                    "options": [
+                        "a) Doblando las rodillas.",
+                        "b) Doblando la espalda.",
+                        "c) Doblando el tronco.",
+                        "d) Doblando el cuello y las caderas."
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "¿Sobre qué trata la S42?",
+                    "options": [
+                        "a) Limpieza.",
+                        "b) Incendios.",
+                        "c) Accidentes.",
+                        "d) Fumigaciones."
+                    ],
+                    "correct": 3
+                },
+                {
+                    "question": "¿Qué técnicas de seguridad tienen como objetivo determinar los peligros y las causas de los accidentes?",
+                    "options": [
+                        "a) Las técnicas analíticas.",
+                        "b) Las técnicas físicas.",
+                        "c) Las técnicas operativas.",
+                        "d) Las técnicas psicológicas."
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "¿Cuál de las siguientes técnicas se encuadra dentro del factor organizacional?",
+                    "options": [
+                        "a) La seguridad en el proyecto, la notificación de peligros y las normas de seguridad.",
+                        "b) La seguridad en el proyecto.",
+                        "c) Las normas de seguridad.",
+                        "d) La notificación de peligros."
+                    ],
+                    "correct": 3
+                },
+                {
+                    "question": "¿Qué significa EPI?",
+                    "options": [
+                        "a) Equipo de Prevención Internacional.",
+                        "b) Equipo de Protección Individual.",
+                        "c) Equipo de Prevención Individual.",
+                        "d) Epidemia Potencialmente Importante."
+                    ],
+                    "correct": 1
+                },
+                {
+                    "question": "¿A qué categoría pertenece un equipo de protección respiratoria filtrante que protege frente a gases irritantes?",
+                    "options": [
+                        "a) Categoría 2.",
+                        "b) Categoría 4.",
+                        "c) Categoría 3.",
+                        "d) Categoría 1."
+                    ],
+                    "correct": 2
+                },
+                {
+                    "question": "¿Cuál de los siguientes es un equipo de protección integral?",
+                    "options": [
+                        "a) Orejeras.",
+                        "b) Casco.",
+                        "c) Mandil.",
+                        "d) Guantes."
+                    ],
+                    "correct": 2
+                },
+                {
+                    "question": "¿A qué se deben, generalmente, las caídas de personas al mismo nivel?",
+                    "options": [
+                        "a) Al uso de equipos eléctricos.",
+                        "b) A la manipulación de mercancías pesadas.",
+                        "c) A resbalones.",
+                        "d) Al uso de escaleras."
+                    ],
+                    "correct": 2
+                },
+                {
+                    "question": "¿A través de qué vía entran en el organismo los agentes químicos que penetran en el cuerpo a través de la piel?",
+                    "options": [
+                        "a) De la vía dérmica.",
+                        "b) De la vía parenteral.",
+                        "c) De la vía digestiva.",
+                        "d) De la vía respiratoria."
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "¿Cuál es la instrucción técnica complementaria que hace referencia al almacenamiento de líquidos inflamables y combustibles?",
+                    "options": [
+                        "a) MIE APQ-5.",
+                        "b) MIE APQ-2.",
+                        "c) MIE APQ-7.",
+                        "d) MIE APQ-1."
+                    ],
+                    "correct": 3
+                },
+                {
+                    "question": "¿Cuál de los siguientes es un factor de riesgo?",
+                    "options": [
+                        "a) Las condiciones de seguridad de las herramientas.",
+                        "b) La organización del trabajo.",
+                        "c) Las condiciones de seguridad de las herramientas.",
+                        "d) La carga de trabajo."
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "¿Qué tipo de recipientes son los más seguros para contener sustancias APQ?",
+                    "options": [
+                        "a) Los recipientes metálicos.",
+                        "b) Los recipientes de plástico.",
+                        "c) Los recipientes de vidrio.",
+                        "d) Depende de la sustancia."
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "¿Con qué tipo de sustancias se pueden almacenar sustancias inflamables?",
+                    "options": [
+                        "a) Con sustancias explosivas.",
+                        "b) Con sustancias tóxicas.",
+                        "c) Con sustancias comburentes.",
+                        "d) Con sustancias inflamables."
+                    ],
+                    "correct": 3
+                },
+                {
+                    "question": "¿Cuál es el Real Decreto sobre disposiciones mínimas de seguridad y salud relativas a la manipulación manual de cargas que entrañe riesgos, en particular dorsolumbares, para los trabajadores?",
+                    "options": [
+                        "a) El R.D. 487/1997, de 14 de abril.",
+                        "b) El R.D. 363/1995, de 10 de marzo.",
+                        "c) El R.D. 379/2001, de 6 de abril.",
+                        "d) El R.D. 374/2001, de 6 de abril."
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "¿Cuántos capítulos tiene la Ley de Prevención de Riesgos Laborales?",
+                    "options": [
+                        "a) Once.",
+                        "b) Quince.",
+                        "c) Siete.",
+                        "d) Cinco."
+                    ],
+                    "correct": 2
+                },
+                {
+                    "question": "¿Cómo han de circular las carretillas elevadoras en las curvas?",
+                    "options": [
+                        "a) Más deprisa.",
+                        "b) Más despacio.",
+                        "c) Marcha atrás.",
+                        "d) A igual velocidad que en rectas."
+                    ],
+                    "correct": 1
+                },
+                {
+                    "question": "El conductor de una carretilla elevador, ¿cuándo debe hacer sonar el claxon?",
+                    "options": [
+                        "a) Mientras circula para avisar, en todo momento, de su presencia.",
+                        "b) Mientras circula marcha atrás.",
+                        "c) Sólo en caso de accidente.",
+                        "d) Cuando se acerque zonas de riesgo, como cruces o zonas peatonales."
+                    ],
+                    "correct": 3
+                },
+                {
+                    "question": "¿Qué tipo de ergonomía se encarga del estudio del bienestar del trabajador en relación a los tiempos de trabajo?",
+                    "options": [
+                        "a) La ergonomía temporal.",
+                        "b) La ergonomía ambiental.",
+                        "c) La ergonomía geométrica.",
+                        "d) La ergonomía mental."
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "¿Cuándo se deben utilizar indicadores ópticos en los dispositivos de presentación de datos?",
+                    "options": [
+                        "a) Cuando la actividad se realiza en un puesto de trabajo fijo.",
+                        "b) Cuando la información es breve.",
+                        "c) Cuando la información concierne a sucesos en un momento concreto.",
+                        "d) Cuando la información debe ir seguida de acciones inmediatas."
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "¿Qué condición debe reunir un trabajo para que el trabajador lo haga suyo?",
+                    "options": [
+                        "a) Es conveniente que el trabajo sea en equipo.",
+                        "b) El producto del trabajo debe ser significativo para la persona, es conveniente que el trabajo sea en equipo y el trabajador ha de disponer de márgenes de libertad en su trabajo.",
+                        "c) El producto del trabajo debe ser significativo para la persona que lo realiza.",
+                        "d) El trabajador ha de disponer de márgenes de libertad en su trabajo."
+                    ],
+                    "correct": 1
+                },
+                {
+                    "question": "Según el R.D. 487/1997, de 14 de abril, ¿cuál es la carga máxima que debe levantar manualmente una mujer?",
+                    "options": [
+                        "a) 25 kg.",
+                        "b) 40 kg.",
+                        "c) 15 kg.",
+                        "d) 35 kg."
+                    ],
+                    "correct": 2
+                },
+                {
+                    "question": "Ante una emergencia, ¿qué actuación se debe realizar antes?",
+                    "options": [
+                        "a) La que se considere prioritaria según las circunstancias de cada caso.",
+                        "b) Socorrer.",
+                        "c) Proteger.",
+                        "d) Avisar."
+                    ],
+                    "correct": 2
+                }
+            ];
+
+            let DOM = {};
+
+            const estado = {
+                preguntaActual: 0,
+                respuestasCorrectas: 0,
+                respuestasIncorrectas: 0,
+                totalPreguntas: preguntas.length
+            };
+
+            let botonesOpciones;
+            let indicesPreguntas;
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            function toggleClasses(element, addClass, removeClasses) {
+                if (removeClasses && removeClasses.length > 0) {
+                    removeClasses.forEach(cls => element.classList.remove(cls));
+                }
+                if (addClass) {
+                    element.classList.add(addClass);
+                }
+            }
+
+            function mostrarModal(message) {
+                DOM.modalMessage.textContent = message;
+                DOM.modalOverlay.classList.remove('hidden');
+            }
+
+            function ocultarModal() {
+                DOM.modalOverlay.classList.add('hidden');
+            }
+
+            function marcarRespuesta(index) {
+                const pregunta = preguntas[index];
+
+                const botonCorrecto = botonesOpciones[pregunta.correct];
+                const indiceCorrecto = indicesPreguntas[index];
+
+                toggleClasses(indiceCorrecto, null, ['correcta', 'incorrecta']);
+
+                if (pregunta.respuestaUsuario !== null) {
+                    toggleClasses(botonCorrecto, 'correcta');
+
+                    if (pregunta.esCorrecta) {
+                        toggleClasses(indiceCorrecto, 'correcta');
+                    } else {
+                        const botonSeleccionado = botonesOpciones[pregunta.respuestaUsuario];
+                        toggleClasses(botonSeleccionado, 'incorrecta');
+                        toggleClasses(indiceCorrecto, 'incorrecta');
+                    }
+                }
+            }
+
+            function mostrarPregunta() {
+                const { preguntaActual, totalPreguntas } = estado;
+                DOM.resultadosFinales.classList.add('hidden');
+                DOM.contenidoPregunta.classList.remove('hidden');
+                DOM.rectanguloResumen.classList.remove('hidden');
+                DOM.finalizarBtn.textContent = 'Finalizar Test';
+
+                const pregunta = preguntas[preguntaActual];
+                const cleanedQuestion = pregunta.question.replace(/^\s*(\d+\.\s*)+/, '');
+                DOM.preguntaTexto.textContent = `${preguntaActual + 1}. ${cleanedQuestion}`;
+
+                botonesOpciones.forEach((boton, index) => {
+                    toggleClasses(boton, null, ['seleccionada', 'correcta', 'incorrecta']);
+                    boton.textContent = pregunta.options[index];
+                    boton.disabled = pregunta.comprobada;
+                });
+
+                if (pregunta.respuestaUsuario !== null) {
+                    toggleClasses(botonesOpciones[pregunta.respuestaUsuario], 'seleccionada');
+                    if (pregunta.comprobada) {
+                        marcarRespuesta(preguntaActual);
+                    }
+                }
+
+                if (indicesPreguntas) {
+                    indicesPreguntas.forEach(indice => indice.classList.remove('activa'));
+                    indicesPreguntas[preguntaActual].classList.add('activa');
+                }
+
+                DOM.comprobarBtn.classList.toggle('hidden', pregunta.comprobada);
+                actualizarEstadoBotones();
+            }
+
+            function manejarSeleccion(event) {
+                const boton = event.target.closest('.opcion');
+                if (boton) {
+                    const pregunta = preguntas[estado.preguntaActual];
+                    if (!pregunta.comprobada) {
+                        botonesOpciones.forEach(b => toggleClasses(b, null, ['seleccionada']));
+                        toggleClasses(boton, 'seleccionada');
+                    }
+                }
+            }
+
+            function comprobarRespuesta() {
+                const respuestaSeleccionadaActual = DOM.opcionesContenedor.querySelector('.opcion.seleccionada');
+                if (!respuestaSeleccionadaActual) {
+                    mostrarModal('Por favor, selecciona una respuesta antes de comprobar.');
+                    return;
+                }
+                const { preguntaActual } = estado;
+                const pregunta = preguntas[preguntaActual];
+                const respuestaIndex = parseInt(respuestaSeleccionadaActual.dataset.index);
+
+                pregunta.respuestaUsuario = respuestaIndex;
+                pregunta.comprobada = true;
+                pregunta.esCorrecta = (respuestaIndex === pregunta.correct);
+
+                if (pregunta.esCorrecta) {
+                    estado.respuestasCorrectas++;
+                } else {
+                    estado.respuestasIncorrectas++;
+                }
+
+                marcarRespuesta(preguntaActual);
+                actualizarResumen();
+
+                botonesOpciones.forEach(boton => boton.disabled = true);
+                DOM.comprobarBtn.classList.add('hidden');
+            }
+
+            function actualizarEstadoBotones() {
+                const { preguntaActual, totalPreguntas } = estado;
+                const esUltimaPregunta = preguntaActual === totalPreguntas - 1;
+                DOM.volverBtn.disabled = preguntaActual === 0;
+                DOM.siguienteBtn.textContent = esUltimaPregunta ? 'Terminar' : 'Siguiente';
+            }
+
+            function siguientePregunta() {
+                const { preguntaActual, totalPreguntas } = estado;
+                if (preguntaActual < totalPreguntas - 1) {
+                    estado.preguntaActual++;
+                    mostrarPregunta();
+                } else {
+                    mostrarResultados();
+                }
+            }
+
+            function volverPregunta() {
+                const { preguntaActual } = estado;
+                if (preguntaActual > 0) {
+                    estado.preguntaActual--;
+                    mostrarPregunta();
+                }
+            }
+
+            function mostrarResultados() {
+                const { respuestasCorrectas, respuestasIncorrectas } = estado;
+                DOM.contenidoPregunta.classList.add('hidden');
+                DOM.resultadosFinales.classList.remove('hidden');
+
+                const correctasSpan = `<span class="resultados-finales-correctas">Correctas: ${respuestasCorrectas}</span>`;
+                const incorrectasSpan = `<span class="resultados-finales-incorrectas">Incorrectas: ${respuestasIncorrectas}</span>`;
+                DOM.resultadosTexto.innerHTML = `${correctasSpan} | ${incorrectasSpan}`;
+
+                DOM.finalizarBtn.textContent = 'Volver al Test';
+                DOM.rectanguloResumen.style.marginTop = '20px';
+            }
+
+            function crearIndices() {
+                DOM.indicesContenedor.innerHTML = Array.from(
+                    {length: estado.totalPreguntas},
+                    (_, i) => `<div class="indice-pregunta" data-index="${i}">${i+1}</div>`
+                ).join('');
+                indicesPreguntas = DOM.indicesContenedor.querySelectorAll('.indice-pregunta');
+            }
+
+            function manejarClickIndice(event) {
+                const indice = event.target.closest('.indice-pregunta');
+                if (indice) {
+                    estado.preguntaActual = parseInt(indice.dataset.index);
+                    mostrarPregunta();
+                }
+            }
+
+            function actualizarResumen() {
+                indicesPreguntas.forEach((indice, index) => {
+                    toggleClasses(indice, null, ['correcta', 'incorrecta']);
+                    const pregunta = preguntas[index];
+                    if (pregunta.comprobada) {
+                        if (pregunta.esCorrecta) {
+                            toggleClasses(indice, 'correcta');
+                        } else {
+                            toggleClasses(indice, 'incorrecta');
+                        }
+                    }
+                });
+            }
+
+            function toggleFinalizarTest() {
+                if (DOM.resultadosFinales.classList.contains('hidden')) {
+                    mostrarResultados();
+                } else {
+                    mostrarPregunta();
+                }
+            }
+            
+            function volverAlMenuPrincipal() {
+                window.location.href = '../MF1014_3 - Organización de Almacenes.html';
+            }
+
+            function cacheElements() {
+                return {
+                    preguntaTexto: document.getElementById('pregunta-texto'),
+                    opcionesContenedor: document.getElementById('opciones-contenedor'),
+                    siguienteBtn: document.getElementById('siguiente-btn'),
+                    volverBtn: document.getElementById('volver-btn'),
+                    comprobarBtn: document.getElementById('comprobar-btn'),
+                    indicesContenedor: document.getElementById('indices-contenedor'),
+                    contenedorTest: document.querySelector('section.contenedor-test'),
+                    rectanguloResumen: document.querySelector('footer.rectangulo-resumen'),
+                    modalOverlay: document.getElementById('custom-modal-overlay'),
+                    modalMessage: document.getElementById('custom-modal-message'),
+                    modalOkBtn: document.getElementById('custom-modal-ok'),
+                    contenidoPregunta: document.getElementById('contenido-pregunta'),
+                    resultadosFinales: document.getElementById('resultados-finales'),
+                    resultadosTexto: document.getElementById('resultados-texto'),
+                    finalizarBtn: document.getElementById('finalizar-btn'),
+                    volverMenuBtn: document.getElementById('volver-menu-btn'),
+                };
+            }
+
+            function initData() {
+                shuffleArray(preguntas);
+                preguntas = preguntas.map(p => ({
+                    ...p,
+                    respuestaUsuario: null,
+                    comprobada: false,
+                    esCorrecta: false
+                }));
+
+                const fragmentoOpciones = document.createDocumentFragment();
+                for (let i = 0; i < 4; i++) {
+                    const boton = document.createElement('button');
+                    boton.className = 'opcion';
+                    boton.dataset.index = i;
+                    fragmentoOpciones.appendChild(boton);
+                }
+                DOM.opcionesContenedor.appendChild(fragmentoOpciones);
+
+                botonesOpciones = Array.from(DOM.opcionesContenedor.querySelectorAll('.opcion'));
+
+                crearIndices();
+            }
+
+            function setupEvents() {
+                DOM.contenedorTest.addEventListener('click', (event) => {
+                    const target = event.target;
+                    if (target.id === 'siguiente-btn') {
+                        siguientePregunta();
+                    } else if (target.id === 'volver-btn') {
+                        volverPregunta();
+                    } else if (target.id === 'comprobar-btn') {
+                        comprobarRespuesta();
+                    } else if (target.classList.contains('opcion')) {
+                        manejarSeleccion(event);
+                    }
+                });
+
+                DOM.rectanguloResumen.addEventListener('click', (event) => {
+                    const target = event.target;
+                    if (target.id === 'finalizar-btn') {
+                        toggleFinalizarTest();
+                    } else if (target.classList.contains('indice-pregunta')) {
+                        manejarClickIndice(event);
+                    }
+                });
+
+                DOM.modalOkBtn.addEventListener('click', ocultarModal);
+                DOM.volverMenuBtn.addEventListener('click', volverAlMenuPrincipal);
+            }
+
+            function init() {
+                DOM = cacheElements();
+                initData();
+                setupEvents();
+                mostrarPregunta();
+            }
+
+            init();
+        });
+    </script>
+</body>
+</html>
