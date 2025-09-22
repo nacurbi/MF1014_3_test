@@ -244,6 +244,21 @@
             color: #721c24;
             font-weight: bold;
         }
+        .boton-volver-menu {
+            background-color: #cce5ff;
+            color: #004085;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .boton-volver-menu:hover {
+            background-color: #b3d7ff;
+        }
         
         @media (max-width: 800px) {
             section.contenedor-test, footer.rectangulo-resumen {
@@ -272,7 +287,7 @@
             <div id="resultados-finales" class="hidden resultados-finales-container">
                 <h2>Resultados Finales</h2>
                 <div id="resultados-texto" class="resultados-finales-texto"></div>
-                
+                <button id="volver-menu-btn" class="boton-volver-menu">Volver al menú principal</button>
             </div>
         </section>
         <footer class="rectangulo-resumen" id="rectangulo-resumen">
@@ -1196,6 +1211,9 @@
                 }
             }
             
+            function volverAlMenuPrincipal() {
+                window.location.href = '../index.html';
+            }
 
             function cacheElements() {
                 return {
@@ -1213,7 +1231,8 @@
                     contenidoPregunta: document.getElementById('contenido-pregunta'),
                     resultadosFinales: document.getElementById('resultados-finales'),
                     resultadosTexto: document.getElementById('resultados-texto'),
-                    finalizarBtn: document.getElementById('finalizar-btn')
+                    finalizarBtn: document.getElementById('finalizar-btn'),
+                    volverMenuBtn: document.getElementById('volver-menu-btn')
                 };
             }
 
@@ -1284,7 +1303,7 @@
                 });
 
                 DOM.modalOkBtn.addEventListener('click', ocultarModal);
-                
+                DOM.volverMenuBtn.addEventListener('click', volverAlMenuPrincipal);
             }
 
             function init() {
