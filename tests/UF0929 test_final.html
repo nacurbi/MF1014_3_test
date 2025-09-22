@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UF0929 Gestión de pedidos y stocks</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #F0F0F0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .contenedor-principal {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            padding: 20px;
+            z-index: 1;
+        }
+
+        section.contenedor-test, footer.rectangulo-resumen {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 800px;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .titulo-test {
+            font-size: 24px;
+            font-weight: bold;
+            color: #6c757d;
+            margin: 0 0 20px 0;
+            text-align: center;
+        }
+
+        .pregunta {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: left;
+        }
+        .opciones-contenedor {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .opcion {
+            background-color: #e9ecef;
+            border: 2px solid #e9ecef;
+            color: #495057;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s, border-color 0.2s;
+            text-align: left;
+        }
+        .opcion:hover {
+            background-color: #dee2e6;
+        }
+        .opcion.seleccionada {
+            background-color: #cce5ff;
+            border-color: #cce5ff;
+            color: #004085;
+        }
+        .opcion.correcta {
+            background-color: #85d192;
+            border-color: #85d192;
+            color: #155724;
+            cursor: default;
+        }
+        .opcion.incorrecta {
+            background-color: #f0a1a8;
+            border-color: #f0a1a8;
+            color: #721c24;
+            cursor: default;
+        }
+        .opcion.correcta:hover, .opcion.incorrecta:hover {
+            background-color: #85d192;
+            color: #155724;
+            border-color: #85d192;
+        }
+        .opcion.incorrecta:hover {
+            background-color: #f0a1a8;
+            color: #721c24;
+            border-color: #f0a1a8;
+        }
+        .navegacion-btn-contenedor {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .comprobar-btn, #finalizar-btn, #volver-menu-btn {
+            background-color: #cce5ff;
+            color: #004085;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .comprobar-btn:hover, #finalizar-btn:hover, #volver-menu-btn:hover {
+            background-color: #b3d7ff;
+        }
+        .hidden {
+            display: none;
+        }
+
+        .navegacion-btn {
+            background-color: #E0E0E0;
+            color: #555;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .navegacion-btn:hover {
+            background-color: #CFCFCF;
+        }
+        .navegacion-btn:disabled {
+            background-color: #f1f1f1;
+            color: #aaa;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        footer.rectangulo-resumen {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 800px;
+            margin-top: 20px;
+            overflow-y: auto;
+        }
+        .indices-contenedor {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .indice-pregunta {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            color: #495057;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .indice-pregunta.activa {
+            background-color: #cce5ff;
+            color: #004085;
+            border: none;
+        }
+        .indice-pregunta:hover {
+            background-color: #dee2e6;
+        }
+        .indice-pregunta.correcta {
+            background-color: #85d192;
+            color: #155724;
+        }
+        .indice-pregunta.incorrecta {
+            background-color: #f0a1a8;
+            color: #495057;
+        }
+
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .custom-modal {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .custom-modal h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .custom-modal button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .resultados-finales-container {
+            text-align: center;
+        }
+        .resultados-finales-texto {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .resultados-finales-correctas {
+            color: #155724;
+            font-weight: bold;
+        }
+        .resultados-finales-incorrectas {
+            color: #721c24;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 800px) {
+            section.contenedor-test, footer.rectangulo-resumen {
+                width: 95%;
+                padding: 15px;
+            }
+            .opcion {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="contenedor-principal">
+        <h1 class="titulo-test">UF0929 Gestión de pedidos y stocks</h1>
+        <section class="contenedor-test">
+            <article id="contenido-pregunta">
+                <div class="pregunta" id="pregunta-texto"></div>
+                <div class="opciones-contenedor" id="opciones-contenedor"></div>
+                <div class="navegacion-btn-contenedor">
+                    <button id="volver-btn" class="navegacion-btn">Anterior</button>
+                    <button id="comprobar-btn" class="comprobar-btn">Comprobar</button>
+                    <button id="siguiente-btn" class="navegacion-btn">Siguiente</button>
+                </div>
+            </article>
+            <div id="resultados-finales" class="hidden resultados-finales-container">
+                <h2>Resultados Finales</h2>
+                <div id="resultados-texto" class="resultados-finales-texto"></div>
+                <button id="volver-menu-btn" class="comprobar-btn">Volver al menú principal</button>
+            </div>
+        </section>
+        <footer class="rectangulo-resumen" id="rectangulo-resumen">
+            <div class="indices-contenedor" id="indices-contenedor"></div>
+            <button id="finalizar-btn" class="comprobar-btn" style="width: 100%; margin-top: 20px;">Finalizar Test</button>
+        </footer>
+    </div>
+
+    <div id="custom-modal-overlay" class="custom-modal-overlay hidden">
+        <div class="custom-modal">
+            <p id="custom-modal-message"></p>
+            <button id="custom-modal-ok">Aceptar</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let preguntas = [
+  {
+    "question": "Mercancía acumulada en el almacén, necesaria para asegurar los procesos de producción y distribución:",
+    "options": [
+      "a) Stock",
+      "b) Obsoletos",
+      "c) Materia Prima",
+      "d) Mercadería"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "Agrupación de productos por cliente y por ruta:",
+    "options": [
+      "a) Extracción",
+      "b) Consolidación",
+      "c) Verificación",
+      "d) Envasado y Embalaje"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "El planteamiento de tiempos y cantidad de productos recogidos y empaquetados por cada operario nos\n indica su:",
+    "options": [
+      "a) Productividad",
+      "b) Tiempo de Orden de Pedido",
+      "c) TMO: tiempo medio operativo",
+      "d) Rentabilidad"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "Si un operario se sube en una máquina recogepedidos, inferior a 6m de altura, ¿a qué nivel está\n trabajando?",
+    "options": [
+      "a) A nivel ALTO",
+      "b) A MEDIO nivel",
+      "c) A nivel TELEMÁTICO",
+      "d) A BAJO nivel"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Cómo se llama la diferencia entre los valores reales del stock y los registros informatizados:",
+    "options": [
+      "a) Falta de Comunicación",
+      "b) Sobrestock",
+      "c) Robo",
+      "d) Desviación"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Señala la afirmación incorrecta:",
+    "options": [
+      "a) La planificación de la ruta de recogida de productos ahorra tiempo",
+      "b) El proceso de picking es uno de los más costosos",
+      "c) Trasladar mercancías desde el vehículo hasta el punto donde son recibidas se llama proceso de carga",
+      "d) Trasladar mercancías desde el vehículo hasta el punto donde son recibidas se llama proceso de descarga"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "Las incidencias más habituales en carga y descarga son:",
+    "options": [
+      "a) Retrasos en transporte",
+      "b) Cargas no preparadas",
+      "c) Personal no disponible",
+      "d) Todas las anteriores"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Los inventarios Cíclicos o Rotativos se realizan...",
+    "options": [
+      "a) Varias veces al año",
+      "b) Por grupos de productos con características comunes",
+      "c) Una vez al año",
+      "d) Por ubicaciones"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "Las incoherencias entre inventario físico e informático pueden provocar:",
+    "options": [
+      "a) Roturas de stocks",
+      "b) Sobrestock",
+      "c) Todas son correctas",
+      "d) Mala imagen"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "Si contamos los productos ubicados en almacén, hablamos de:",
+    "options": [
+      "a) Inventario informático",
+      "b) Inventario físico",
+      "c) Inventario técnico",
+      "d) Inventario económico"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "Significado de SKU:",
+    "options": [
+      "a) Código de Barras",
+      "b) Referencia del producto",
+      "c) Relación con el cliente",
+      "d) Stock Keeping Unit"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Sistema que permite integrar todos los procesos de negocio de una empresa en un solo sistema,\n permitiendo una gestión más eficiente y una mejor toma de decisiones.",
+    "options": [
+      "a) EDI",
+      "b) SGA",
+      "c) ERP",
+      "d) CRM"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Cuál de todos los tipos de almacén es correcto?",
+    "options": [
+      "a) Almacén de producción",
+      "b) Almacén de distribución",
+      "c) Almacén de punto de venta",
+      "d) Todos son válidos"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Cómo se denomina al conjunto de movimientos dentro del almacén:",
+    "options": [
+      "a) Ciclo de aprovisionamiento",
+      "b) Flujo Externo",
+      "c) Flujo Interno",
+      "d) Ninguna es correcta"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "En qué fase de la cadena de suministro se adquieren materias para producción:",
+    "options": [
+      "a) Aprovisionamiento",
+      "b) Distribución",
+      "c) Almacenaje",
+      "d) Comercialización"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "Qué documento que no se suele usar en el almacén y sí en otros procesos de la empresa:",
+    "options": [
+      "a) Albarán",
+      "b) Inventario",
+      "c) Hoja de picking",
+      "d) Factura"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "En la fase de recepción, cuando contamos los bultos que llegan y su contenido, estamos realizando un:",
+    "options": [
+      "a) Control Estético",
+      "b) Control Cualitativo",
+      "c) Control Aleatorio",
+      "d) Control Cuantitativo"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Cuando se da la circunstancia de que no hay mercancía suficiente para preparar un pedido, nos\n encontramos ante:",
+    "options": [
+      "a) Falta de liquidez",
+      "b) Retraso",
+      "c) Disfunción",
+      "d) Rotura de stock"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Cuál de todas las respuestas se refiere a un indicador de gestión de almacén:",
+    "options": [
+      "a) Índice de Rotación",
+      "b) Índice de Cobertura",
+      "c) Índice de Obsolescencia",
+      "d) Todas son correctas"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Nivel de stock que indica que se debe realizar un nuevo pedido al proveedor:",
+    "options": [
+      "a) Stock de seguridad",
+      "b) Punto de pedido",
+      "c) Rotura de stock",
+      "d) Stock en tránsito"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "Indicador que informa si se está gestionando correctamente el stock del almacén:",
+    "options": [
+      "a) ROI",
+      "b) Índice de rotación",
+      "c) Índice de cobertura",
+      "d) Porcentaje de cobertura"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "El sistema Just in Time está relacionado con movimientos de mercancía o pedidos:",
+    "options": [
+      "a) Bajo demanda",
+      "b) No se almacena",
+      "c) Stock cero disponible",
+      "d) Todas son correctas"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Cuando disponemos de existencias previstas para picos de demanda, lo denominamos:",
+    "options": [
+      "a) Stock de anticipación",
+      "b) Stock de especulación",
+      "c) Stock muerto",
+      "d) Stock de seguridad"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "Cómo se denomina el porcentaje de pedidos no entregados sobre el total de pedidos recibidos:",
+    "options": [
+      "a) Índice de material obsoleto",
+      "b) Índice de rotura de stocks",
+      "c) Índice de pedidos parciales servidos",
+      "d) Índice de rotación"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "Cuáles son los tipos de materiales más habituales a almacenar:",
+    "options": [
+      "a) Materias primas, productos terminados y combustibles",
+      "b) Materiales de construcción, productos químicos y alimentos",
+      "c) Productos terminados, semielaborados y en proceso",
+      "d) Productos acabados, semiterminados y materia prima"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Cuál es la forma correcta de levantar manualmente una carga para evitar lesiones?",
+    "options": [
+      "a) Doblar la espalda mientras se mantiene las piernas rectas",
+      "b) Sujetar la carga con una sola mano y levantar rápidamente",
+      "c) Flexionar las rodillas, mantener la espalda recta y levantar con la fuerza de las piernas",
+      "d) Inclinar el cuerpo hacia adelante y tirar de la carga con los brazos"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué equipamiento se utiliza en un almacén para mover objetos desde el camión al interior del almacén?",
+    "options": [
+      "a) Estantería dinámica",
+      "b) Muelle de carga",
+      "c) Cinta transportadora elevadora",
+      "d) Apilador manual"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Cuál es la finalidad principal del stock de seguridad en un almacén?",
+    "options": [
+      "a) Aumentar los costes de almacenamiento",
+      "b) Prevenir roturas de stock ante imprevistos en la demanda o en el suministro",
+      "c) Facilitar la rotación de productos obsoletos",
+      "d) Reducir el número de referencias almacenadas"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Cuál es una de las tareas principales en la fase de recepción de mercancías en un almacén?",
+    "options": [
+      "a) Colocar los productos directamente en las estanterías sin revisión",
+      "b) Realizar el picking de los pedidos",
+      "c) Verificar la mercancía recibida con el albarán o pedido",
+      "d) Cargar la mercancía en los camiones para su envío"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Cuál es una de las funciones principales del Sistema de Gestión de Almacén (SGA)?",
+    "options": [
+      "a) Gestionar la contabilidad de la empresa",
+      "b) Planificar campañas de marketing",
+      "c) Diseñar el layout del almacén",
+      "d) Controlar ubicaciones y movimientos de mercancía en tiempo real"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Qué método de valoración de inventario asigna el coste más reciente a las salidas?",
+    "options": [
+      "a) FIFO",
+      "b) PMP",
+      "c) LIFO",
+      "d) ABC"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué objetivo tiene la clasificación ABC en la gestión de stocks?",
+    "options": [
+      "a) Clasificar mercancía por peso",
+      "b) Priorizar productos según su valor y rotación",
+      "c) Etiquetar productos según su fecha de caducidad",
+      "d) Establecer turnos de trabajo para el personal"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué tipo de picking se basa en recoger productos para varios pedidos a la vez?",
+    "options": [
+      "a) Picking en línea",
+      "b) Picking por lotes",
+      "c) Picking inverso",
+      "d) Picking al azar"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué se entiende por rotación de stock?",
+    "options": [
+      "a) La variación del precio del producto",
+      "b) La frecuencia con la que se vende y repone un producto",
+      "c) El cambio de ubicación del producto dentro del almacén",
+      "d) El movimiento de los trabajadores entre zonas"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué es el lead time en la gestión de pedidos?",
+    "options": [
+      "a) El tiempo de vigencia de un presupuesto",
+      "b) El periodo entre la entrega y el pago",
+      "c) El tiempo entre la realización del pedido y la recepción del mismo",
+      "d) La duración del contrato con el proveedor"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué sistema de almacenamiento suele usarse para productos de alta rotación?",
+    "options": [
+      "a) Estanterías dinámicas",
+      "b) Almacenamiento en bloque",
+      "c) Almacenamiento caótico",
+      "d) Estanterías móviles"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "¿Qué sistema de gestión organiza las entradas, salidas y ubicaciones del almacén?",
+    "options": [
+      "a) ERP",
+      "b) CRM",
+      "c) SGA",
+      "d) FIFO"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué es un lote económico de pedido?",
+    "options": [
+      "a) El pedido más barato",
+      "b) La cantidad óptima que minimiza los costes totales de aprovisionamiento",
+      "c) El pedido urgente",
+      "d) Un pedido pequeño"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Cuál de los siguientes documentos no es habitual en la gestión de pedidos?",
+    "options": [
+      "a) Albarán",
+      "b) Pedido",
+      "c) Nómina",
+      "d) Factura"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué debe incluir una ficha de producto en almacén?",
+    "options": [
+      "a) Nombre del jefe de almacén",
+      "b) Código, descripción, unidad, ubicación y stock",
+      "c) Solo el código",
+      "d) Precio de venta"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué permite un sistema de trazabilidad?",
+    "options": [
+      "a) Conocer el recorrido del producto desde su origen hasta el cliente",
+      "b) Calcular costes de transporte",
+      "c) Programar pedidos automáticos",
+      "d) Clasificar referencias por zona"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "¿Cuál de los siguientes es un KPI de almacén?",
+    "options": [
+      "a) Nivel de servicio",
+      "b) Salario medio",
+      "c) Metros cuadrados",
+      "d) Coste por unidad"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "Si hablamos de KPI, ¿a qué nos referimos?",
+    "options": [
+      "a) Indicador de nivel de stock y alerta si es bajo",
+      "b) Métrica que permite a las empresas medir y evaluar el porcentaje de errores",
+      "c) Métrica que permite a las empresas medir y evaluar el tiempo de producción",
+      "d) Métrica que permite a las empresas medir y evaluar su progreso hacia metas y objetivos estratégicos"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Qué elemento se usa para localizar productos dentro del almacén?",
+    "options": [
+      "a) Pedido",
+      "b) Factura",
+      "c) Código o etiqueta identificativa",
+      "d) RMA"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué es el cross docking?",
+    "options": [
+      "a) Técnica donde la mercancía no se almacena y se redistribuye directamente",
+      "b) Sistema de almacenamiento de reserva",
+      "c) Método de codificación",
+      "d) Control de stock obsoleto"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "¿Cuál es el objetivo del layout de almacén?",
+    "options": [
+      "a) Controlar horarios",
+      "b) Maximizar stock",
+      "c) Optimizar la distribución del espacio y los flujos de trabajo",
+      "d) Registrar costes"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué indicador refleja cuántos días podemos operar sin reponer?",
+    "options": [
+      "a) Índice de rotación",
+      "b) Cobertura de stock",
+      "c) Lead time",
+      "d) Nivel de servicio"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Cuál de estos es un equipo de manutención?",
+    "options": [
+      "a) Computadora",
+      "b) Transpaleta",
+      "c) Teléfono",
+      "d) Cajonera"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué se hace al registrar una entrada de mercancía?",
+    "options": [
+      "a) Picking",
+      "b) Actualización del stock",
+      "c) Embalaje",
+      "d) Albarán de devolución"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Cuál es la diferencia entre embalaje primario, secundario y terciario?",
+    "options": [
+      "a) El embalaje primario se usa solo para exportación; el secundario y terciario para almacén",
+      "b) El embalaje terciario es el más ligero y está en contacto directo con el producto",
+      "c) El embalaje primario protege el producto unitario, el secundario agrupa varios productos y el terciario facilita\n el transporte y almacenamiento",
+      "d) No existe diferencia; son sinónimos. Depende del número de capas que rodeen al producto"
+    ],
+    "correct": 2
+  }
+];
+            let DOM = {};
+
+            const estado = {
+                preguntaActual: 0,
+                respuestasCorrectas: 0,
+                respuestasIncorrectas: 0,
+                totalPreguntas: preguntas.length
+            };
+
+            let botonesOpciones;
+            let indicesPreguntas;
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            function toggleClasses(element, addClass, removeClasses) {
+                if (removeClasses && removeClasses.length > 0) {
+                    removeClasses.forEach(cls => element.classList.remove(cls));
+                }
+                if (addClass) {
+                    element.classList.add(addClass);
+                }
+            }
+
+            function mostrarModal(message) {
+                DOM.modalMessage.textContent = message;
+                DOM.modalOverlay.classList.remove('hidden');
+            }
+
+            function ocultarModal() {
+                DOM.modalOverlay.classList.add('hidden');
+            }
+
+            function marcarRespuesta(index) {
+                const pregunta = preguntas[index];
+
+                const botonCorrecto = botonesOpciones[pregunta.correct];
+                const indiceCorrecto = indicesPreguntas[index];
+
+                toggleClasses(indiceCorrecto, null, ['correcta', 'incorrecta']);
+
+                if (pregunta.respuestaUsuario !== null) {
+                    toggleClasses(botonCorrecto, 'correcta');
+
+                    if (pregunta.esCorrecta) {
+                        toggleClasses(indiceCorrecto, 'correcta');
+                    } else {
+                        const botonSeleccionado = botonesOpciones[pregunta.respuestaUsuario];
+                        toggleClasses(botonSeleccionado, 'incorrecta');
+                        toggleClasses(indiceCorrecto, 'incorrecta');
+                    }
+                }
+            }
+
+            function mostrarPregunta() {
+                const { preguntaActual, totalPreguntas } = estado;
+                DOM.resultadosFinales.classList.add('hidden');
+                DOM.contenidoPregunta.classList.remove('hidden');
+                DOM.rectanguloResumen.classList.remove('hidden');
+                DOM.finalizarBtn.textContent = 'Finalizar Test';
+
+                const pregunta = preguntas[preguntaActual];
+                const cleanedQuestion = pregunta.question.replace(/^\s*(\d+\.\s*)+/, '');
+                DOM.preguntaTexto.textContent = `${preguntaActual + 1}. ${cleanedQuestion}`;
+
+                botonesOpciones.forEach((boton, index) => {
+                    toggleClasses(boton, null, ['seleccionada', 'correcta', 'incorrecta']);
+                    boton.textContent = pregunta.options[index];
+                    boton.disabled = pregunta.comprobada;
+                });
+
+                if (pregunta.respuestaUsuario !== null) {
+                    toggleClasses(botonesOpciones[pregunta.respuestaUsuario], 'seleccionada');
+                    if (pregunta.comprobada) {
+                        marcarRespuesta(preguntaActual);
+                    }
+                }
+
+                if (indicesPreguntas) {
+                    indicesPreguntas.forEach(indice => indice.classList.remove('activa'));
+                    indicesPreguntas[preguntaActual].classList.add('activa');
+                }
+
+                DOM.comprobarBtn.classList.toggle('hidden', pregunta.comprobada);
+                actualizarEstadoBotones();
+            }
+
+            function manejarSeleccion(event) {
+                const boton = event.target.closest('.opcion');
+                if (boton) {
+                    const pregunta = preguntas[estado.preguntaActual];
+                    if (!pregunta.comprobada) {
+                        botonesOpciones.forEach(b => toggleClasses(b, null, ['seleccionada']));
+                        toggleClasses(boton, 'seleccionada');
+                    }
+                }
+            }
+
+            function comprobarRespuesta() {
+                const respuestaSeleccionadaActual = DOM.opcionesContenedor.querySelector('.opcion.seleccionada');
+                if (!respuestaSeleccionadaActual) {
+                    mostrarModal('Por favor, selecciona una respuesta antes de comprobar.');
+                    return;
+                }
+                const { preguntaActual } = estado;
+                const pregunta = preguntas[preguntaActual];
+                const respuestaIndex = parseInt(respuestaSeleccionadaActual.dataset.index);
+
+                pregunta.respuestaUsuario = respuestaIndex;
+                pregunta.comprobada = true;
+                pregunta.esCorrecta = (respuestaIndex === pregunta.correct);
+
+                if (pregunta.esCorrecta) {
+                    estado.respuestasCorrectas++;
+                } else {
+                    estado.respuestasIncorrectas++;
+                }
+
+                marcarRespuesta(preguntaActual);
+                actualizarResumen();
+
+                botonesOpciones.forEach(boton => boton.disabled = true);
+                DOM.comprobarBtn.classList.add('hidden');
+            }
+
+            function actualizarEstadoBotones() {
+                const { preguntaActual, totalPreguntas } = estado;
+                const esUltimaPregunta = preguntaActual === totalPreguntas - 1;
+                DOM.volverBtn.disabled = preguntaActual === 0;
+                DOM.siguienteBtn.textContent = esUltimaPregunta ? 'Terminar' : 'Siguiente';
+            }
+
+            function siguientePregunta() {
+                const { preguntaActual, totalPreguntas } = estado;
+                if (preguntaActual < totalPreguntas - 1) {
+                    estado.preguntaActual++;
+                    mostrarPregunta();
+                } else {
+                    mostrarResultados();
+                }
+            }
+
+            function volverPregunta() {
+                const { preguntaActual } = estado;
+                if (preguntaActual > 0) {
+                    estado.preguntaActual--;
+                    mostrarPregunta();
+                }
+            }
+
+            function mostrarResultados() {
+                const { respuestasCorrectas, respuestasIncorrectas } = estado;
+                DOM.contenidoPregunta.classList.add('hidden');
+                DOM.resultadosFinales.classList.remove('hidden');
+
+                const correctasSpan = `<span class="resultados-finales-correctas">Correctas: ${respuestasCorrectas}</span>`;
+                const incorrectasSpan = `<span class="resultados-finales-incorrectas">Incorrectas: ${respuestasIncorrectas}</span>`;
+                DOM.resultadosTexto.innerHTML = `${correctasSpan} | ${incorrectasSpan}`;
+
+                DOM.finalizarBtn.textContent = 'Volver al Test';
+                DOM.rectanguloResumen.style.marginTop = '20px';
+            }
+
+            function crearIndices() {
+                DOM.indicesContenedor.innerHTML = Array.from(
+                    {length: estado.totalPreguntas},
+                    (_, i) => `<div class="indice-pregunta" data-index="${i}">${i+1}</div>`
+                ).join('');
+                indicesPreguntas = DOM.indicesContenedor.querySelectorAll('.indice-pregunta');
+            }
+
+            function manejarClickIndice(event) {
+                const indice = event.target.closest('.indice-pregunta');
+                if (indice) {
+                    estado.preguntaActual = parseInt(indice.dataset.index);
+                    mostrarPregunta();
+                }
+            }
+
+            function actualizarResumen() {
+                indicesPreguntas.forEach((indice, index) => {
+                    toggleClasses(indice, null, ['correcta', 'incorrecta']);
+                    const pregunta = preguntas[index];
+                    if (pregunta.comprobada) {
+                        if (pregunta.esCorrecta) {
+                            toggleClasses(indice, 'correcta');
+                        } else {
+                            toggleClasses(indice, 'incorrecta');
+                        }
+                    }
+                });
+            }
+
+            function toggleFinalizarTest() {
+                if (DOM.resultadosFinales.classList.contains('hidden')) {
+                    mostrarResultados();
+                } else {
+                    mostrarPregunta();
+                }
+            }
+
+            function volverAlMenuPrincipal() {
+                window.location.href = '../index.html';
+            }
+            
+
+            function cacheElements() {
+                return {
+                    preguntaTexto: document.getElementById('pregunta-texto'),
+                    opcionesContenedor: document.getElementById('opciones-contenedor'),
+                    siguienteBtn: document.getElementById('siguiente-btn'),
+                    volverBtn: document.getElementById('volver-btn'),
+                    comprobarBtn: document.getElementById('comprobar-btn'),
+                    indicesContenedor: document.getElementById('indices-contenedor'),
+                    contenedorTest: document.querySelector('section.contenedor-test'),
+                    rectanguloResumen: document.querySelector('footer.rectangulo-resumen'),
+                    modalOverlay: document.getElementById('custom-modal-overlay'),
+                    modalMessage: document.getElementById('custom-modal-message'),
+                    modalOkBtn: document.getElementById('custom-modal-ok'),
+                    contenidoPregunta: document.getElementById('contenido-pregunta'),
+                    resultadosFinales: document.getElementById('resultados-finales'),
+                    resultadosTexto: document.getElementById('resultados-texto'),
+                    finalizarBtn: document.getElementById('finalizar-btn'),
+                    volverMenuBtn: document.getElementById('volver-menu-btn')
+                };
+            }
+
+            function initData() {
+                const labels = ['a) ', 'b) ', 'c) ', 'd) '];
+                preguntas.forEach(p => {
+                    if (p.options && p.options.length > 0 && typeof p.correct === 'number' && p.correct < p.options.length) {
+                        const correctAnswerText = p.options[p.correct].substring(3).trim();
+                        let answerTexts = p.options.map(opt => opt.substring(3).trim());
+                        
+                        for (let i = answerTexts.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [answerTexts[i], answerTexts[j]] = [answerTexts[j], answerTexts[i]];
+                        }
+                        
+                        p.options = answerTexts.map((text, index) => labels[index] + text);
+                        const newCorrectIndex = answerTexts.findIndex(text => text === correctAnswerText);
+                        
+                        if (newCorrectIndex !== -1) {
+                           p.correct = newCorrectIndex;
+                        }
+                    }
+                });
+
+                shuffleArray(preguntas);
+                preguntas = preguntas.map(p => ({
+                    ...p,
+                    respuestaUsuario: null,
+                    comprobada: false,
+                    esCorrecta: false
+                }));
+
+                const fragmentoOpciones = document.createDocumentFragment();
+                for (let i = 0; i < 4; i++) {
+                    const boton = document.createElement('button');
+                    boton.className = 'opcion';
+                    boton.dataset.index = i;
+                    fragmentoOpciones.appendChild(boton);
+                }
+                DOM.opcionesContenedor.appendChild(fragmentoOpciones);
+
+                botonesOpciones = Array.from(DOM.opcionesContenedor.querySelectorAll('.opcion'));
+
+                crearIndices();
+            }
+
+            function setupEvents() {
+                DOM.contenedorTest.addEventListener('click', (event) => {
+                    const target = event.target;
+                    if (target.id === 'siguiente-btn') {
+                        siguientePregunta();
+                    } else if (target.id === 'volver-btn') {
+                        volverPregunta();
+                    } else if (target.id === 'comprobar-btn') {
+                        comprobarRespuesta();
+                    } else if (target.classList.contains('opcion')) {
+                        manejarSeleccion(event);
+                    }
+                });
+
+                DOM.rectanguloResumen.addEventListener('click', (event) => {
+                    const target = event.target;
+                    if (target.id === 'finalizar-btn') {
+                        toggleFinalizarTest();
+                    } else if (target.classList.contains('indice-pregunta')) {
+                        manejarClickIndice(event);
+                    }
+                });
+
+                DOM.modalOkBtn.addEventListener('click', ocultarModal);
+                DOM.volverMenuBtn.addEventListener('click', volverAlMenuPrincipal);
+            }
+
+            function init() {
+                DOM = cacheElements();
+                initData();
+                setupEvents();
+                mostrarPregunta();
+            }
+
+            init();
+        });
+    </script>
+</body>
+</html>
