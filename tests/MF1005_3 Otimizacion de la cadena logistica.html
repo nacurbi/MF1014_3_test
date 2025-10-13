@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MF1005_3 Otimizacion de la cadena logistica</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #F0F0F0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .contenedor-principal {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            padding: 20px;
+            z-index: 1;
+        }
+
+        section.contenedor-test, footer.rectangulo-resumen {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 800px;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .titulo-test {
+            font-size: 24px;
+            font-weight: bold;
+            color: #6c757d;
+            margin: 0 0 20px 0;
+            text-align: center;
+        }
+
+        .pregunta {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: left;
+        }
+        .opciones-contenedor {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .opcion {
+            background-color: #e9ecef;
+            border: 2px solid #e9ecef;
+            color: #495057;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s, border-color 0.2s;
+            text-align: left;
+        }
+        .opcion:hover {
+            background-color: #dee2e6;
+        }
+        .opcion.seleccionada {
+            background-color: #cce5ff;
+            border-color: #cce5ff;
+            color: #004085;
+        }
+        .opcion.correcta {
+            background-color: #85d192;
+            border-color: #85d192;
+            color: #155724;
+            cursor: default;
+        }
+        .opcion.incorrecta {
+            background-color: #f0a1a8;
+            border-color: #f0a1a8;
+            color: #721c24;
+            cursor: default;
+        }
+        .opcion.correcta:hover, .opcion.incorrecta:hover {
+            background-color: #85d192;
+            color: #155724;
+            border-color: #85d192;
+        }
+        .opcion.incorrecta:hover {
+            background-color: #f0a1a8;
+            color: #721c24;
+            border-color: #f0a1a8;
+        }
+        .navegacion-btn-contenedor {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .comprobar-btn, #finalizar-btn {
+            background-color: #cce5ff;
+            color: #004085;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .comprobar-btn:hover, #finalizar-btn:hover {
+            background-color: #b3d7ff;
+        }
+        .hidden {
+            display: none;
+        }
+
+        .navegacion-btn {
+            background-color: #E0E0E0;
+            color: #555;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .navegacion-btn:hover {
+            background-color: #CFCFCF;
+        }
+        .navegacion-btn:disabled {
+            background-color: #f1f1f1;
+            color: #aaa;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        footer.rectangulo-resumen {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 800px;
+            margin-top: 20px;
+            overflow-y: auto;
+        }
+        .indices-contenedor {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .indice-pregunta {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            color: #495057;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .indice-pregunta.activa {
+            background-color: #cce5ff;
+            color: #004085;
+            border: none;
+        }
+        .indice-pregunta:hover {
+            background-color: #dee2e6;
+        }
+        .indice-pregunta.correcta {
+            background-color: #85d192;
+            color: #155724;
+        }
+        .indice-pregunta.incorrecta {
+            background-color: #f0a1a8;
+            color: #495057;
+        }
+
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .custom-modal {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .custom-modal h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .custom-modal button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .resultados-finales-container {
+            text-align: center;
+        }
+        .resultados-finales-texto {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .resultados-finales-correctas {
+            color: #155724;
+            font-weight: bold;
+        }
+        .resultados-finales-incorrectas {
+            color: #721c24;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 800px) {
+            section.contenedor-test, footer.rectangulo-resumen {
+                width: 95%;
+                padding: 15px;
+            }
+            .opcion {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="contenedor-principal">
+        <h1 class="titulo-test">MF1005_3 Otimizacion de la cadena logistica</h1>
+        <section class="contenedor-test">
+            <article id="contenido-pregunta">
+                <div class="pregunta" id="pregunta-texto"></div>
+                <div class="opciones-contenedor" id="opciones-contenedor"></div>
+                <div class="navegacion-btn-contenedor">
+                    <button id="volver-btn" class="navegacion-btn">Anterior</button>
+                    <button id="comprobar-btn" class="comprobar-btn">Comprobar</button>
+                    <button id="siguiente-btn" class="navegacion-btn">Siguiente</button>
+                </div>
+            </article>
+            <div id="resultados-finales" class="hidden resultados-finales-container">
+                <h2>Resultados Finales</h2>
+                <div id="resultados-texto" class="resultados-finales-texto"></div>
+                <button class="comprobar-btn" style="margin-top: 20px;" onclick="window.location.href='../index.html'">Volver al menu principal</button>
+            </div>
+        </section>
+        <footer class="rectangulo-resumen" id="rectangulo-resumen">
+            <div class="indices-contenedor" id="indices-contenedor"></div>
+            <button id="finalizar-btn" class="comprobar-btn" style="width: 100%; margin-top: 20px;">Finalizar Test</button>
+        </footer>
+    </div>
+
+    <div id="custom-modal-overlay" class="custom-modal-overlay hidden">
+        <div class="custom-modal">
+            <p id="custom-modal-message"></p>
+            <button id="custom-modal-ok">Aceptar</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let preguntas = [
+  {
+    "question": "¿Qué es la logística?",
+    "options": [
+      "a) Es un conjunto de actividades cuya finalidad es la de conseguir que mejoren las ventas.",
+      "b) Es la unión de ciertas actividades cuyo fin es la consecución de todos los recursos necesarios para que estén\n disponibles en el momento, lugar y cantidad concreta y al mínimo coste.",
+      "c) Es un conjunto de actividades cuya finalidad es la de conseguir que se aumente la producción.",
+      "d) Es la unión de ciertas actividades cuyo fin es la consecución de todos los recursos necesarios para que no\n estén disponibles en el momento, lugar y cantidad concreta y al máximo coste."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "La cadena de suministro abarca:",
+    "options": [
+      "a) La fase de producción del producto hasta el almacén de la empresa.",
+      "b) La fase de almacenamiento y traslado.",
+      "c) Las actividades relacionadas con el flujo de materiales e información desde la adquisición de materias primas\n hasta el cliente final.",
+      "d) Las actividades relacionadas con el flujo de información desde la adquisición de materias primas hasta el\n cliente final."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "En las relaciones integrales las empresas buscan:",
+    "options": [
+      "a) Implicación de todos los actores y actividades asociadas.",
+      "b) Un mayor beneficio de la empresa principal.",
+      "c) Un mayor ahorro de energía.",
+      "d) Compartir la información estrictamente necesaria."
+    ],
+    "correct": 0
+  },
+  {
+    "question": "Algunas de las actividades logísticas para dar un buen servicio al cliente son:",
+    "options": [
+      "a) Servicio posventa.",
+      "b) Entrega a tiempo.",
+      "c) Rapidez de atención a un pedido.",
+      "d) Servicio postventa, entrega a tiempo y rapidez de atención."
+    ],
+    "correct": 3
+  },
+  {
+    "question": "El flujo de información es:",
+    "options": [
+      "a) La transmisión de datos que se realiza desde la orden de pedido hasta que llega al proveedor final.",
+      "b) El movimiento de materiales desde la entrada hasta la salida en un sistema logístico.",
+      "c) La transmisión económica de una empresa a un proveedor.",
+      "d) La transmisión de datos que se realiza desde la orden de pedido hasta que llega al intermediario."
+    ],
+    "correct": 0
+  },
+  {
+    "question": "La información debe:",
+    "options": [
+      "a) Ser comprensible por un gran número de personas.",
+      "b) Tener en cuenta al destinatario y emplear un lenguaje comprensible.",
+      "c) Utilizar sistemas informáticos sencillos y fáciles de utilizar.",
+      "d) Ser comprensible por un gran número de personas, tener en cuenta al destinatario y utilizar sistemas\n informáticos sencillos para aumentar su alcance."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "Podemos decir que la calidad es:",
+    "options": [
+      "a) Lograr reducir el absentismo laboral.",
+      "b) Satisfacer plenamente las necesidades del cliente y cumplir con sus expectativas.",
+      "c) Conseguir aumentar las ventas a través de agentes externos.",
+      "d) Satisfacer parcialmente las necesidades del cliente."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "El lead-time está formado por los tiempos de:",
+    "options": [
+      "a) Producción.",
+      "b) Transporte y distribución.",
+      "c) Venta y disposición al cliente.",
+      "d) Producción, transporte, distribución, venta y disposición al cliente."
+    ],
+    "correct": 3
+  },
+  {
+    "question": "El servicio al cliente constituye todo el conjunto de acciones necesarias para que el cliente reciba:",
+    "options": [
+      "a) La información adecuada.",
+      "b) El producto deseado.",
+      "c) Un tiempo de espera máximo.",
+      "d) La información adecuada y el producto deseado."
+    ],
+    "correct": 3
+  },
+  {
+    "question": "La trazabilidad consiste en:",
+    "options": [
+      "a) Origen de sus componentes.",
+      "b) Historia de los procesos aplicados al producto.",
+      "c) Distribución y localización después de su entrega.",
+      "d) Origen de sus componentes, historia de procesos aplicados y distribución y localización tras la entrega."
+    ],
+    "correct": 3
+  },
+  {
+    "question": "El aprovisionamiento consiste en:",
+    "options": [
+      "a) Distribuir los productos a los clientes.",
+      "b) Garantizar el suministro de materiales y recursos necesarios para la producción.",
+      "c) Organizar el transporte de los productos terminados.",
+      "d) Almacenar productos en fase de distribución."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "El transporte en logística se refiere a:",
+    "options": [
+      "a) El movimiento de información entre proveedores y clientes.",
+      "b) El traslado físico de bienes desde un punto de origen hasta un destino.",
+      "c) La gestión de inventarios en almacenes.",
+      "d) El análisis de costes de producción."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué es el inventario?",
+    "options": [
+      "a) Una técnica de venta directa al cliente final.",
+      "b) El registro y control de las existencias disponibles en un almacén.",
+      "c) Un documento de control financiero.",
+      "d) La suma de todos los costes logísticos."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué es un stock de seguridad?",
+    "options": [
+      "a) El inventario sobrante.",
+      "b) El exceso de productos en el almacén.",
+      "c) La cantidad adicional de producto que se mantiene para evitar rupturas de stock.",
+      "d) Los productos defectuosos."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué es un operador logístico?",
+    "options": [
+      "a) El responsable de una tienda.",
+      "b) Una empresa especializada en gestionar y coordinar parte o todas las actividades logísticas de otra.",
+      "c) Un conductor de transporte.",
+      "d) Un programador informático."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué significa logística inversa?",
+    "options": [
+      "a) Proceso de almacenamiento de productos.",
+      "b) El control del flujo financiero.",
+      "c) El retorno de productos desde el consumidor hacia el fabricante o distribuidor.",
+      "d) La creación de nuevos productos."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "El \"just in time\" busca:",
+    "options": [
+      "a) Acumular grandes cantidades de stock.",
+      "b) Reducir inventarios y producir solo lo necesario en el momento exacto.",
+      "c) Vender a mayor velocidad en el mercado.",
+      "d) Ampliar los plazos de entrega."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué es la intermodalidad en el transporte?",
+    "options": [
+      "a) El uso de un único tipo de transporte.",
+      "b) El uso combinado de diferentes modos de transporte en una misma cadena de suministro.",
+      "c) El control de las rutas de camiones.",
+      "d) El transporte exclusivo por carretera."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué son los costes logísticos?",
+    "options": [
+      "a) Los gastos de personal.",
+      "b) Los gastos derivados de transporte, almacenamiento, inventario y gestión de la cadena de suministro.",
+      "c) Los costes de producción industrial.",
+      "d) El precio de venta al cliente más el margen de beneficio."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Cuál es el objetivo principal de la logística?",
+    "options": [
+      "a) Aumentar el inventario.",
+      "b) Satisfacer al cliente final al menor coste posible.",
+      "c) Reducir el personal de la empresa.",
+      "d) Crear nuevas líneas de producción."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué es el picking?",
+    "options": [
+      "a) Un método de transporte marítimo.",
+      "b) La preparación de pedidos en un almacén.",
+      "c) Una técnica de embalaje.",
+      "d) Un sistema de trazabilidad."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué significa \"outsourcing\" en logística?",
+    "options": [
+      "a) Internalización de procesos logísticos.",
+      "b) Externalización de actividades logísticas a empresas especializadas.",
+      "c) Incremento del inventario de seguridad.",
+      "d) Subida de precios de transporte."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué es un almacén central?",
+    "options": [
+      "a) El almacén más pequeño de una empresa.",
+      "b) El lugar donde se fabrican los productos.",
+      "c) El centro que concentra y distribuye los productos a otros almacenes o puntos de venta.",
+      "d) El espacio destinado únicamente a devoluciones."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué significa FIFO en logística?",
+    "options": [
+      "a) First in, First order.",
+      "b) First in, First out.",
+      "c) First in, Fast out.",
+      "d) Free in, Free out."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué significa LIFO en logística?",
+    "options": [
+      "a) Last in, Fast out.",
+      "b) Last in, First out.",
+      "c) Last in, Free out.",
+      "d) Last input, Final output."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué es el cross-docking?",
+    "options": [
+      "a) Almacenaje prolongado de mercancías.",
+      "b) Técnica que reduce o elimina el almacenamiento, transfiriendo productos directamente de la recepción a la\n expedición.",
+      "c) Distribución a clientes finales únicamente.",
+      "d) Retorno de productos."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué significa KPI en logística?",
+    "options": [
+      "a) Knowledge Performance Input.",
+      "b) Key Potential Indicator.",
+      "c) Key Performance Indicator.",
+      "d) Key Process Integration."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué significa supply chain?",
+    "options": [
+      "a) Cadena de valor financiero.",
+      "b) Cadena de suministro.",
+      "c) Cadena de ventas.",
+      "d) Cadena de clientes."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué es el embalaje?",
+    "options": [
+      "a) El transporte de productos.",
+      "b) El conjunto de materiales que protegen un producto para su almacenamiento y transporte.",
+      "c) El contrato de compraventa.",
+      "d) La entrega al cliente final."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué es la última milla en logística?",
+    "options": [
+      "a) El transporte intermodal en puertos.",
+      "b) El tramo final de entrega del producto al cliente.",
+      "c) El trayecto desde la fábrica al almacén central.",
+      "d) El proceso de devolución de mercancías."
+    ],
+    "correct": 1
+  },
+  {
+    "question": "Tiempo que discurre desde que se genera una orden de pedido a un proveedor hasta que se entrega la\n mercancía de ese proveedor al cliente:",
+    "options": [
+      "a) Lead Time",
+      "b) Lean Management",
+      "c) Outsourcing",
+      "d) Full Time"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "Herramienta de análisis interno que permite estudiar las principales actividades de una empresa con el\n fin de saber cuáles de ellas generan un valor o ventaja comercial en el producto final:",
+    "options": [
+      "a) Distribución escalonada",
+      "b) Cadena de valor añadido",
+      "c) Cadena logística",
+      "d) Logística inversa"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "El desvío que disminuye la capacidad de producción de una empresa, se llama:",
+    "options": [
+      "a) Fábrica fantasma",
+      "b) Despilfarro",
+      "c) Plan de viabilidad",
+      "d) Fondo de inversión"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "Organización que indica una serie de condiciones de comercio internacionales que concretan las cláusulas\n comerciales en un contrato de compraventa internacional:",
+    "options": [
+      "a) EFQM",
+      "b) ISO",
+      "c) INCOTERM",
+      "d) AECOC"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "Valor que supone dejar de invertir en algo para hacerlo en otra cosa, también conocido como coste de la\n alternativa no seleccionada:",
+    "options": [
+      "a) Costo medio",
+      "b) Costo individualizado",
+      "c) Costo logístico de oportunidad",
+      "d) Costo fijo + Costo variable"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "El período de devolución para material comprado online, legalmente, es de:",
+    "options": [
+      "a) No se puede devolver",
+      "b) Depende del servicio de atención al cliente",
+      "c) Catorce días naturales",
+      "d) En función de la política de devolución de cada compañía"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "¿Qué opciones da la logística inversa para recuperar los productos?",
+    "options": [
+      "a) Reutilización, reparación, reciclaje y desechar.",
+      "b) Redefinir, rentabilizar, reestructurar y desechar.",
+      "c) Reeducar, reconciliar, recoger y desechar.",
+      "d) Ninguna es correcta."
+    ],
+    "correct": 0
+  },
+  {
+    "question": "Los llamados pool de palets son organizaciones de servicios que buscan:",
+    "options": [
+      "a) Optimizar el flujo de mercancías.",
+      "b) Minimizar costes de almacenaje.",
+      "c) Manipulación y transporte eficientes.",
+      "d) Todas son correctas."
+    ],
+    "correct": 3
+  },
+  {
+    "question": "En la distribución escalonada:",
+    "options": [
+      "a) Existen uno o varios almacenes regionales conocidos como reguladores.",
+      "b) El objetivo es aproximar el producto al distribuidor.",
+      "c) Es propia de las producciones que están alejadas de los puntos de venta.",
+      "d) Ninguna es correcta."
+    ],
+    "correct": 0
+  },
+  {
+    "question": "Contrato de Transporte Internacional de Mercancías por Carretera:",
+    "options": [
+      "a) CMR",
+      "b) CIM",
+      "c) CTIMC",
+      "d) TMS"
+    ],
+    "correct": 0
+  }
+];
+            let DOM = {};
+
+            const estado = {
+                preguntaActual: 0,
+                respuestasCorrectas: 0,
+                respuestasIncorrectas: 0,
+                totalPreguntas: preguntas.length
+            };
+
+            let botonesOpciones;
+            let indicesPreguntas;
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            function toggleClasses(element, addClass, removeClasses) {
+                if (removeClasses && removeClasses.length > 0) {
+                    removeClasses.forEach(cls => element.classList.remove(cls));
+                }
+                if (addClass) {
+                    element.classList.add(addClass);
+                }
+            }
+
+            function mostrarModal(message) {
+                DOM.modalMessage.textContent = message;
+                DOM.modalOverlay.classList.remove('hidden');
+            }
+
+            function ocultarModal() {
+                DOM.modalOverlay.classList.add('hidden');
+            }
+
+            function marcarRespuesta(index) {
+                const pregunta = preguntas[index];
+
+                const botonCorrecto = botonesOpciones[pregunta.correct];
+                const indiceCorrecto = indicesPreguntas[index];
+
+                toggleClasses(indiceCorrecto, null, ['correcta', 'incorrecta']);
+
+                if (pregunta.respuestaUsuario !== null) {
+                    toggleClasses(botonCorrecto, 'correcta');
+
+                    if (pregunta.esCorrecta) {
+                        toggleClasses(indiceCorrecto, 'correcta');
+                    } else {
+                        const botonSeleccionado = botonesOpciones[pregunta.respuestaUsuario];
+                        toggleClasses(botonSeleccionado, 'incorrecta');
+                        toggleClasses(indiceCorrecto, 'incorrecta');
+                    }
+                }
+            }
+
+            function mostrarPregunta() {
+                const { preguntaActual, totalPreguntas } = estado;
+                DOM.resultadosFinales.classList.add('hidden');
+                DOM.contenidoPregunta.classList.remove('hidden');
+                DOM.rectanguloResumen.classList.remove('hidden');
+                DOM.finalizarBtn.textContent = 'Finalizar Test';
+
+                const pregunta = preguntas[preguntaActual];
+                const cleanedQuestion = pregunta.question.replace(/^\s*(\d+\.\s*)+/, '');
+                DOM.preguntaTexto.textContent = `${preguntaActual + 1}. ${cleanedQuestion}`;
+
+                botonesOpciones.forEach((boton, index) => {
+                    toggleClasses(boton, null, ['seleccionada', 'correcta', 'incorrecta']);
+                    boton.textContent = pregunta.options[index];
+                    boton.disabled = pregunta.comprobada;
+                });
+
+                if (pregunta.respuestaUsuario !== null) {
+                    toggleClasses(botonesOpciones[pregunta.respuestaUsuario], 'seleccionada');
+                    if (pregunta.comprobada) {
+                        marcarRespuesta(preguntaActual);
+                    }
+                }
+
+                if (indicesPreguntas) {
+                    indicesPreguntas.forEach(indice => indice.classList.remove('activa'));
+                    indicesPreguntas[preguntaActual].classList.add('activa');
+                }
+
+                DOM.comprobarBtn.classList.toggle('hidden', pregunta.comprobada);
+                actualizarEstadoBotones();
+            }
+
+            function manejarSeleccion(event) {
+                const boton = event.target.closest('.opcion');
+                if (boton) {
+                    const pregunta = preguntas[estado.preguntaActual];
+                    if (!pregunta.comprobada) {
+                        botonesOpciones.forEach(b => toggleClasses(b, null, ['seleccionada']));
+                        toggleClasses(boton, 'seleccionada');
+                    }
+                }
+            }
+
+            function comprobarRespuesta() {
+                const respuestaSeleccionadaActual = DOM.opcionesContenedor.querySelector('.opcion.seleccionada');
+                if (!respuestaSeleccionadaActual) {
+                    mostrarModal('Por favor, selecciona una respuesta antes de comprobar.');
+                    return;
+                }
+                const { preguntaActual } = estado;
+                const pregunta = preguntas[preguntaActual];
+                const respuestaIndex = parseInt(respuestaSeleccionadaActual.dataset.index);
+
+                pregunta.respuestaUsuario = respuestaIndex;
+                pregunta.comprobada = true;
+                pregunta.esCorrecta = (respuestaIndex === pregunta.correct);
+
+                if (pregunta.esCorrecta) {
+                    estado.respuestasCorrectas++;
+                } else {
+                    estado.respuestasIncorrectas++;
+                }
+
+                marcarRespuesta(preguntaActual);
+                actualizarResumen();
+
+                botonesOpciones.forEach(boton => boton.disabled = true);
+                DOM.comprobarBtn.classList.add('hidden');
+            }
+
+            function actualizarEstadoBotones() {
+                const { preguntaActual, totalPreguntas } = estado;
+                const esUltimaPregunta = preguntaActual === totalPreguntas - 1;
+                DOM.volverBtn.disabled = preguntaActual === 0;
+                DOM.siguienteBtn.textContent = esUltimaPregunta ? 'Terminar' : 'Siguiente';
+            }
+
+            function siguientePregunta() {
+                const { preguntaActual, totalPreguntas } = estado;
+                if (preguntaActual < totalPreguntas - 1) {
+                    estado.preguntaActual++;
+                    mostrarPregunta();
+                } else {
+                    mostrarResultados();
+                }
+            }
+
+            function volverPregunta() {
+                const { preguntaActual } = estado;
+                if (preguntaActual > 0) {
+                    estado.preguntaActual--;
+                    mostrarPregunta();
+                }
+            }
+
+            function mostrarResultados() {
+                const { respuestasCorrectas, respuestasIncorrectas } = estado;
+                DOM.contenidoPregunta.classList.add('hidden');
+                DOM.resultadosFinales.classList.remove('hidden');
+
+                const correctasSpan = `<span class="resultados-finales-correctas">Correctas: ${respuestasCorrectas}</span>`;
+                const incorrectasSpan = `<span class="resultados-finales-incorrectas">Incorrectas: ${respuestasIncorrectas}</span>`;
+                DOM.resultadosTexto.innerHTML = `${correctasSpan} | ${incorrectasSpan}`;
+
+                DOM.finalizarBtn.textContent = 'Volver al Test';
+                DOM.rectanguloResumen.style.marginTop = '20px';
+            }
+
+            function crearIndices() {
+                DOM.indicesContenedor.innerHTML = Array.from(
+                    {length: estado.totalPreguntas},
+                    (_, i) => `<div class="indice-pregunta" data-index="${i}">${i+1}</div>`
+                ).join('');
+                indicesPreguntas = DOM.indicesContenedor.querySelectorAll('.indice-pregunta');
+            }
+
+            function manejarClickIndice(event) {
+                const indice = event.target.closest('.indice-pregunta');
+                if (indice) {
+                    estado.preguntaActual = parseInt(indice.dataset.index);
+                    mostrarPregunta();
+                }
+            }
+
+            function actualizarResumen() {
+                indicesPreguntas.forEach((indice, index) => {
+                    toggleClasses(indice, null, ['correcta', 'incorrecta']);
+                    const pregunta = preguntas[index];
+                    if (pregunta.comprobada) {
+                        if (pregunta.esCorrecta) {
+                            toggleClasses(indice, 'correcta');
+                        } else {
+                            toggleClasses(indice, 'incorrecta');
+                        }
+                    }
+                });
+            }
+
+            function toggleFinalizarTest() {
+                if (DOM.resultadosFinales.classList.contains('hidden')) {
+                    mostrarResultados();
+                } else {
+                    mostrarPregunta();
+                }
+            }
+            
+
+            function cacheElements() {
+                return {
+                    preguntaTexto: document.getElementById('pregunta-texto'),
+                    opcionesContenedor: document.getElementById('opciones-contenedor'),
+                    siguienteBtn: document.getElementById('siguiente-btn'),
+                    volverBtn: document.getElementById('volver-btn'),
+                    comprobarBtn: document.getElementById('comprobar-btn'),
+                    indicesContenedor: document.getElementById('indices-contenedor'),
+                    contenedorTest: document.querySelector('section.contenedor-test'),
+                    rectanguloResumen: document.querySelector('footer.rectangulo-resumen'),
+                    modalOverlay: document.getElementById('custom-modal-overlay'),
+                    modalMessage: document.getElementById('custom-modal-message'),
+                    modalOkBtn: document.getElementById('custom-modal-ok'),
+                    contenidoPregunta: document.getElementById('contenido-pregunta'),
+                    resultadosFinales: document.getElementById('resultados-finales'),
+                    resultadosTexto: document.getElementById('resultados-texto'),
+                    finalizarBtn: document.getElementById('finalizar-btn')
+                };
+            }
+
+            function initData() {
+                const labels = ['a) ', 'b) ', 'c) ', 'd) '];
+                preguntas.forEach(p => {
+                    if (p.options && p.options.length > 0 && typeof p.correct === 'number' && p.correct < p.options.length) {
+                        const correctAnswerText = p.options[p.correct].substring(3).trim();
+                        let answerTexts = p.options.map(opt => opt.substring(3).trim());
+                        
+                        for (let i = answerTexts.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [answerTexts[i], answerTexts[j]] = [answerTexts[j], answerTexts[i]];
+                        }
+                        
+                        p.options = answerTexts.map((text, index) => labels[index] + text);
+                        const newCorrectIndex = answerTexts.findIndex(text => text === correctAnswerText);
+                        
+                        if (newCorrectIndex !== -1) {
+                           p.correct = newCorrectIndex;
+                        }
+                    }
+                });
+
+                shuffleArray(preguntas);
+                preguntas = preguntas.map(p => ({
+                    ...p,
+                    respuestaUsuario: null,
+                    comprobada: false,
+                    esCorrecta: false
+                }));
+
+                const fragmentoOpciones = document.createDocumentFragment();
+                for (let i = 0; i < 4; i++) {
+                    const boton = document.createElement('button');
+                    boton.className = 'opcion';
+                    boton.dataset.index = i;
+                    fragmentoOpciones.appendChild(boton);
+                }
+                DOM.opcionesContenedor.appendChild(fragmentoOpciones);
+
+                botonesOpciones = Array.from(DOM.opcionesContenedor.querySelectorAll('.opcion'));
+
+                crearIndices();
+            }
+
+            function setupEvents() {
+                DOM.contenedorTest.addEventListener('click', (event) => {
+                    const target = event.target;
+                    if (target.id === 'siguiente-btn') {
+                        siguientePregunta();
+                    } else if (target.id === 'volver-btn') {
+                        volverPregunta();
+                    } else if (target.id === 'comprobar-btn') {
+                        comprobarRespuesta();
+                    } else if (target.classList.contains('opcion')) {
+                        manejarSeleccion(event);
+                    }
+                });
+
+                DOM.rectanguloResumen.addEventListener('click', (event) => {
+                    const target = event.target;
+                    if (target.id === 'finalizar-btn') {
+                        toggleFinalizarTest();
+                    } else if (target.classList.contains('indice-pregunta')) {
+                        manejarClickIndice(event);
+                    }
+                });
+
+                DOM.modalOkBtn.addEventListener('click', ocultarModal);
+                
+            }
+
+            function init() {
+                DOM = cacheElements();
+                initData();
+                setupEvents();
+                mostrarPregunta();
+            }
+
+            init();
+        });
+    </script>
+</body>
+</html>

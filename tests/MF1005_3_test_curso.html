@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MF1005_3 OPTIMIZACIÓN DE LA CADENA LOGÍSTICA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #F0F0F0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .contenedor-principal {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            padding: 20px;
+            z-index: 1;
+        }
+
+        section.contenedor-test, footer.rectangulo-resumen {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 800px;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .titulo-test {
+            font-size: 24px;
+            font-weight: bold;
+            color: #6c757d;
+            margin: 0 0 20px 0;
+            text-align: center;
+        }
+
+        .pregunta {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: left;
+        }
+        .opciones-contenedor {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .opcion {
+            background-color: #e9ecef;
+            border: 2px solid #e9ecef;
+            color: #495057;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s, border-color 0.2s;
+            text-align: left;
+        }
+        .opcion:hover {
+            background-color: #dee2e6;
+        }
+        .opcion.seleccionada {
+            background-color: #cce5ff;
+            border-color: #cce5ff;
+            color: #004085;
+        }
+        .opcion.correcta {
+            background-color: #85d192;
+            border-color: #85d192;
+            color: #155724;
+            cursor: default;
+        }
+        .opcion.incorrecta {
+            background-color: #f0a1a8;
+            border-color: #f0a1a8;
+            color: #721c24;
+            cursor: default;
+        }
+        .opcion.correcta:hover, .opcion.incorrecta:hover {
+            background-color: #85d192;
+            color: #155724;
+            border-color: #85d192;
+        }
+        .opcion.incorrecta:hover {
+            background-color: #f0a1a8;
+            color: #721c24;
+            border-color: #f0a1a8;
+        }
+        .navegacion-btn-contenedor {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .comprobar-btn, #finalizar-btn {
+            background-color: #cce5ff;
+            color: #004085;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .comprobar-btn:hover, #finalizar-btn:hover {
+            background-color: #b3d7ff;
+        }
+        .hidden {
+            display: none;
+        }
+
+        .navegacion-btn {
+            background-color: #E0E0E0;
+            color: #555;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .navegacion-btn:hover {
+            background-color: #CFCFCF;
+        }
+        .navegacion-btn:disabled {
+            background-color: #f1f1f1;
+            color: #aaa;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        footer.rectangulo-resumen {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 800px;
+            margin-top: 20px;
+            overflow-y: auto;
+        }
+        .indices-contenedor {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .indice-pregunta {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            color: #495057;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .indice-pregunta.activa {
+            background-color: #cce5ff;
+            color: #004085;
+            border: none;
+        }
+        .indice-pregunta:hover {
+            background-color: #dee2e6;
+        }
+        .indice-pregunta.correcta {
+            background-color: #85d192;
+            color: #155724;
+        }
+        .indice-pregunta.incorrecta {
+            background-color: #f0a1a8;
+            color: #495057;
+        }
+
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .custom-modal {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .custom-modal h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .custom-modal button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .resultados-finales-container {
+            text-align: center;
+        }
+        .resultados-finales-texto {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .resultados-finales-correctas {
+            color: #155724;
+            font-weight: bold;
+        }
+        .resultados-finales-incorrectas {
+            color: #721c24;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 800px) {
+            section.contenedor-test, footer.rectangulo-resumen {
+                width: 95%;
+                padding: 15px;
+            }
+            .opcion {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="contenedor-principal">
+        <h1 class="titulo-test">MF1005_3 OPTIMIZACIÓN DE LA CADENA LOGÍSTICA</h1>
+        <section class="contenedor-test">
+            <article id="contenido-pregunta">
+                <div class="pregunta" id="pregunta-texto"></div>
+                <div class="opciones-contenedor" id="opciones-contenedor"></div>
+                <div class="navegacion-btn-contenedor">
+                    <button id="volver-btn" class="navegacion-btn">Anterior</button>
+                    <button id="comprobar-btn" class="comprobar-btn">Comprobar</button>
+                    <button id="siguiente-btn" class="navegacion-btn">Siguiente</button>
+                </div>
+            </article>
+            <div id="resultados-finales" class="hidden resultados-finales-container">
+                <h2>Resultados Finales</h2>
+                <div id="resultados-texto" class="resultados-finales-texto"></div>
+                <button class="comprobar-btn" style="margin-top: 20px;" onclick="window.location.href='../index.html'">Volver al menu principal</button>
+            </div>
+        </section>
+        <footer class="rectangulo-resumen" id="rectangulo-resumen">
+            <div class="indices-contenedor" id="indices-contenedor"></div>
+            <button id="finalizar-btn" class="comprobar-btn" style="width: 100%; margin-top: 20px;">Finalizar Test</button>
+        </footer>
+    </div>
+
+    <div id="custom-modal-overlay" class="custom-modal-overlay hidden">
+        <div class="custom-modal">
+            <p id="custom-modal-message"></p>
+            <button id="custom-modal-ok">Aceptar</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let preguntas = [
+  {
+    "question": "¿Qué es la logística?",
+    "options": [
+      "a) La logística es un conjunto de actividades cuya finalidad es la de conseguir que mejoren las ventas.",
+      "b) La logística es la unión de ciertas actividades cuyo fin es la consecución de todos los recursos necesarios para que estén disponibles en el momento, lugar y cantidad concreta y al mínimo coste.",
+      "c) La logística es un conjunto de actividades cuya finalidad es la de conseguir que se aumente la producción.",
+      "d) La logística es la unión de ciertas actividades cuyo fin es la consecución de todos los recursos necesarios para que no estén disponibles en el momento, lugar y cantidad concreta y al máximo"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "La cadena de suministro abarca:",
+    "options": [
+      "a) La fase de producción del producto hasta el almacén de la empresa.",
+      "b) La fase de almacenamiento y traslado.",
+      "c) Las actividades relacionadas con el flujo de materiales e información desde la adquisición de materias primas hasta el cliente final.",
+      "d) Las actividades relacionadas con el flujo de información desde la adquisición de materias primas hasta el cliente"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "En las relaciones integrales las empresas buscan:",
+    "options": [
+      "a) Implicación de todos los actores y actividades asociadas.",
+      "b) Un mayor beneficio de la empresa principal.",
+      "c) Un mayor ahorro de energía.",
+      "d) Compartir la información estrictamente"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "Algunas de las actividades logísticas para dar un buen servicio al cliente son:",
+    "options": [
+      "a) Servicio posventa.",
+      "b) Entrega a tiempo.",
+      "c) Rapidez de atención a un pedido.",
+      "d) Servicio postventa, entrega a tiempo y rapidez de"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "El flujo de información es:",
+    "options": [
+      "a) La trasmisión de datos que se realiza desde la orden de pedido hasta que llega al proveedor final.",
+      "b) El movimiento de materiales desde la entrada hasta la salida en un sistema logístico o red de suministro para enlazar todas las operaciones a realizar, así como de expedición.",
+      "c) La trasmisión económica de una empresa a un proveedor.",
+      "d) La trasmisión de datos que se realiza desde la orden de pedido hasta que llega al"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "La información debe:",
+    "options": [
+      "a) Ser comprensible por un gran número de personas.",
+      "b) Tener en cuenta al destinatario y emplear un lenguaje comprensible.",
+      "c) Utilizar sistemas informáticos sencillos y fáciles de utilizar para llegar a más usuarios.",
+      "d) Ser comprensible por un gran número de personas, tener en cuenta al destinatario y utilizar sistemas informáticos sencillos para aumentar su"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Podemos decir que la calidad es:",
+    "options": [
+      "a) Lograr reducir el absentismo laboral.",
+      "b) Satisfacer plenamente las necesidades del cliente y cumplir con sus expectativas.",
+      "c) Conseguir aumentar las ventas a través de agentes externos.",
+      "d) Satisfacer parcialmente las necesidades del"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "El lead-time está formado por los tiempos de:",
+    "options": [
+      "a) Producción.",
+      "b) Transporte y distribución.",
+      "c) Venta y disposición al cliente.",
+      "d) Producción, transporte, distribución, venta y disposición al"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "El servicio al cliente constituye todo el conjunto de acciones necesarias para que el cliente reciba:",
+    "options": [
+      "a) La Información adecuada.",
+      "b) El producto deseado.",
+      "c) Un tiempo de espera máximo.",
+      "d) La información adecuada y el producto"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "La trazabilidad consiste en la disponibilidad de información para conocer la historia, trayecto o aplicación de un producto, identificando:",
+    "options": [
+      "a) Origen de sus componentes.",
+      "b) Historia de los procesos aplicados al producto.",
+      "c) Distribución y localización después de su entrega.",
+      "d) Origen de sus componentes, historia de procesos aplicados y distribución y localización tras la"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "La logística inversa se encarga de los procesos de retorno, tales como...",
+    "options": [
+      "a) Las devoluciones",
+      "b) La reutilización y reciclaje",
+      "c) Los residuos",
+      "d) Las devoluciones, reutilización, reciclaje y los residuos"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "La logística inversa:",
+    "options": [
+      "a) Es el flujo de información al contrario",
+      "b) Se ocupa de los procesos de retorno",
+      "c) Es el flujo de materiales desde el proveedor hasta el cliente",
+      "d) Se ocupa de los procesos de envío a destino"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué opciones da la logística inversa para recuperar los productos?",
+    "options": [
+      "a) Reutilización, reparación, reciclaje y desechar",
+      "b) Redefinir, rentabilizar, reestructurar y desechar",
+      "c) Reeducar, reconciliar, recoger y desechar",
+      "d) Reutilización, reparación y desechar"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "Ventajas de la logística inversa sobre la tradicional:",
+    "options": [
+      "a) Ofrece una imagen de marca comprometida con el medio ambiente",
+      "b) Ofrece la posibilidad de cambiar el envase de los productos",
+      "c) Sirve de herramienta para el cumplimiento con la legislación",
+      "d) Ofrece imagen de marca comprometida con el medio ambiente, la posibilidad de cambiar el envase y sirve de herramienta para el cumplimiento con la legislación"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Diferencias entre la logística tradicional y la inversa:",
+    "options": [
+      "a) En la logística tradicional la gestión de inventario es muy compleja, mientras que en la logística inversa es relativamente sencilla",
+      "b) En la logística tradicional no es tan importante la rapidez en la entrega, mientras que en la logística inversa la rapidez es muy importante",
+      "c) En la logística tradicional la previsión de la demanda es relativamente sencilla, mientras que en la logística inversa es más compleja",
+      "d) En la logística tradicional el ciclo de vida del producto es más complejo, mientras que en la logística inversa el ciclo de vida del producto es gestionable"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "Aspectos a tener en cuenta al diseñar un programa de logística inversa:",
+    "options": [
+      "a) Considerar la logística inversa como un factor que puede generar una ventaja competitiva",
+      "b) Admitir que la responsabilidad de una empresa no termina cuando el producto se entrega al cliente",
+      "c) Asumir que la logística inversa requiere de procesos complejos que deben contar con recursos propios",
+      "d) Considerar la logística inversa como un factor que puede generar ventaja competitiva, admitir que la responsabilidad de una empresa no termina al entregar su mercancía, asumir que la logística inversa requiere de procesos complejos"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "A la hora de diseñar para el reciclaje hay que tener en cuenta ciertas pautas:",
+    "options": [
+      "a) Evitar el transporte por medios aéreos",
+      "b) Tener en cuenta el reaprovechamiento de los materiales una vez en desuso",
+      "c) Sustituir materiales peligrosos o contaminantes por otros que cuiden el medio ambiente y eviten en lo posible los desechos",
+      "d) Tener en cuenta el reaprovechamiento de materiales, sustituir los peligrosos o contaminantes por otros que cuiden el medio ambiente"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Los llamados *pool de plataformas* son organizaciones de servicios integradas por los diversos agentes que intervienen en el transporte de los productos, los cuales persiguen una serie de objetivos, como:",
+    "options": [
+      "a) Optimizar el flujo de mercancías",
+      "b) Minimizar los costes de almacenaje",
+      "c) Manipulación y transporte de las unidades de carga",
+      "d) Optimizar flujo de mercancías, minimizar costes de almacenaje y la manipulación y transporte de la carga"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Reutilizar los productos consiste en:",
+    "options": [
+      "a) Darles una segunda vida útil, sea con el mismo uso o con otro distinto",
+      "b) Recoger y tratar los residuos, para poder reintroducirlos en una nueva cadena de valor",
+      "c) Adquirirlos a un precio más económico",
+      "d) Darles una segunda vida útil con el mismo uso que tenían"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "Algunas de las actividades incluidas en la cadena logística inversa son:",
+    "options": [
+      "a) Separar los productos retomados",
+      "b) Clasificar los productos y agruparlos para que el transporte resulte rentable",
+      "c) Transporte hacia el productor",
+      "d) Separar los productos retomados, clasificar los productos y agruparlos para que el transporte hacia el productor y hacia el cliente resulte rentable"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Para conseguir optimizar los costos logísticos se debe:",
+    "options": [
+      "a) Perfeccionar los procedimientos logísticos.",
+      "b) Implantar un modelo de seguimiento y mejora continuo.",
+      "c) Estandarizar los métodos de cálculo de costes logísticos.",
+      "d) Todas son"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Para calcular el costo total logístico tendremos en cuenta los costos de:",
+    "options": [
+      "a) Calidad.",
+      "b) Almacenaje.",
+      "c) Producción.",
+      "d) Maquinaria de"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "Existen varios métodos para calcular el valor de las existencias, que son:",
+    "options": [
+      "a) Método FIFO.",
+      "b) Método concurrente.",
+      "c) Método anterior.",
+      "d) Método"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "Los costes de stock se calculan teniendo en cuenta:",
+    "options": [
+      "a) Coste de obsolescencia.",
+      "b) Coste los impuestos asociados al stock.",
+      "c) Coste de rotura y pérdida.",
+      "d) Todas son"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Los costos directos:",
+    "options": [
+      "a) No se identifican con una sola actividad logística.",
+      "b) Es el valor que supone dejar de invertir en algo para hacerlo en otra cosa.",
+      "c) Se identifican directamente con una actividad logística.",
+      "d) Se identifican indirectamente con una actividad"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "El costo total es:",
+    "options": [
+      "a) La suma de los costos fijos unitarios + los costos variables unitarios.",
+      "b) Los costos variables totales / cantidad total.",
+      "c) La suma de los costos fijos + costos variables.",
+      "d) La suma de los costos variables unitarios + los costos fijos"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "Causas para la variación de costes logísticos entre unas empresas y otras:",
+    "options": [
+      "a) No tienen procesos ni criterios estandarizados.",
+      "b) Existen dificultades de acceso a los datos.",
+      "c) Los métodos de contabilidad no obtienen toda la información más importante.",
+      "d) Todas son"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Algunas estrategias para optimizar los costos logísticos son:",
+    "options": [
+      "a) Estrategia rápido/lento.",
+      "b) Estrategia de utilización de operadores logísticos.",
+      "c) Estrategia de logística de salida.",
+      "d) Todas son"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Puntos críticos en la cadena logística:",
+    "options": [
+      "a) Producción rápida.",
+      "b) Ventas al por mayor.",
+      "c) Mala planificación del diseño del producto.",
+      "d) Roturas de"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "Entre las medidas para optimizar los costes de transporte, tenemos:",
+    "options": [
+      "a) Elección del medio de transporte que se va a utilizar.",
+      "b) Programación de las rutas.",
+      "c) La distribución del almacén.",
+      "d) Elección del medio de transporte y programación de las"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Son ventajas de los operadores logísticos:",
+    "options": [
+      "a) Ahorro de los costes para los clientes",
+      "b) Poder realizar transportes completos",
+      "c) Cuidado del medio ambiente",
+      "d) Ahorro de costes para clientes, poder realizar transportes completos y cuidado del medio ambiente"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Son ventajas de la distribución directa desde fábrica a cliente:",
+    "options": [
+      "a) Ahorro de costes en stock",
+      "b) Rapidez en la entrega",
+      "c) Mínimos costes de transporte",
+      "d) Máximos costes en la entrega y portes"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "Las empresas que utilizan la distribución a través de un almacén",
+    "options": [
+      "a) Tienen un gran ahorro en costes de stock",
+      "b) Son empresas que suelen actuar en mercados locales o provinciales",
+      "c) Son empresas que actúan con productos bajo pedido",
+      "d) Son empresas que siempre actúan en mercados internacionales"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "Son ventajas de la distribución directa a través de un almacén regulador:",
+    "options": [
+      "a) Permitir una planificación exhaustiva",
+      "b) Permitir un control de stock diario",
+      "c) Reducir el tiempo de entrega",
+      "d) Todas son correctas"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "La distribución escalonada:",
+    "options": [
+      "a) Es utilizada por empresas que actúan en un mercado local",
+      "b) Es utilizada por empresas que actúan en un mercado nacional o internacional",
+      "c) Es utilizada por empresas que fabrican bajo pedido",
+      "d) Es utilizada por empresas que actúan en un mercado exclusivamente nacional"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "Como inconvenientes de la distribución escalonada tenemos:",
+    "options": [
+      "a) Lentitud en las entregas",
+      "b) Gran inversión en almacenes y distribución",
+      "c) Costes elevados de stocks mínimos",
+      "d) Gran inversión en almacenes y distribución y los costes elevados de stocks mínimos"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Las empresas que contratan el outsourcing buscan:",
+    "options": [
+      "a) Centralización en las actividades principales de la empresa",
+      "b) Externalizar áreas auxiliares y de distribución",
+      "c) Minimizar costes",
+      "d) Centralización en actividades principales de la empresa, externalizar áreas auxiliares y de distribución y minimizar costes"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Los costes de transporte se calculan teniendo en cuenta:",
+    "options": [
+      "a) Los costes fijos + costes variables + otros gastos",
+      "b) Gastos de personal de compras y almacén + costo del suministro + comunicaciones, etc.",
+      "c) Valor promedio de los inventarios + gastos de seguros + costo de obsolescencia, etc.",
+      "d) Amortización + financiación + alquileres,"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "Los costes de almacenaje se calculan teniendo en cuenta:",
+    "options": [
+      "a) El número de proveedores disponibles.",
+      "b) La demanda anual de productos.",
+      "c) El espacio ocupado, el tiempo de almacenamiento y los recursos empleados.",
+      "d) El precio de venta de los productos"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "Los costes de preparación de pedidos se calculan teniendo en cuenta:",
+    "options": [
+      "a) El precio de compra de los productos.",
+      "b) La ubicación geográfica de los clientes.",
+      "c) El tiempo y recursos necesarios para recoger, empaquetar y documentar cada pedido.",
+      "d) La cantidad de inventario disponible en el"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "Algunos de los errores que se dan en el envío de muestras son:",
+    "options": [
+      "a) La muestra no representa la calidad real del producto.",
+      "b) No se ha realizado un buen embalaje o no se ha atendido al requerimiento del cliente.",
+      "c) Los etiquetados son inadecuados, poco resistentes o ilegibles.",
+      "d) La muestra no representa la calidad real, está bien embalado o se ignora el requerimiento del cliente o los etiquetados son inadecuados, poco resistentes o"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Algunos de los errores que se dan en el envío con carga parcial son:",
+    "options": [
+      "a) Calcular los costos de transporte teniendo en cuenta el precio por cargas",
+      "b) No cumplir con los plazos de entrega pues los grupajes pueden",
+      "c) Elegir a transportistas que no realizan viajes regularmente, lo que puede producir un mayor retraso en la salida hasta que tengan carga suficiente para el mismo",
+      "d) Calcular costos de transporte según el precio por cargas completas, no cumplir con plazos de entrega por retraso con grupaje, elección de transportistas que no hacen viajes regulares, con lo que puede haber un mayor retraso hasta que no tengan carga"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "¿Cómo se puede optimizar la carga y descarga?",
+    "options": [
+      "a) Controlando el stock de materiales.",
+      "b) Verificando las rutas.",
+      "c) Estableciendo una zona de carga y descarga rápida.",
+      "d) Contratando a más personal en"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "En el transporte y entrega, alguna de las medidas que se pueden tomar para evitar puntos críticos son:",
+    "options": [
+      "a) Reducir el número de vehículos utilizados.",
+      "b) Aprovechar al máximo el número de cargas completas.",
+      "c) Fijar las estanterías al suelo.",
+      "d) Reducir el número de vehículos utilizados y aprovechar al máximo el número de cargas"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Son incidencias más frecuentes:",
+    "options": [
+      "a) Enviar los servicios a otros destinos, que trae como consecuencia inmediata retrasos mínimos de 24 horas en la mayoría de los",
+      "b) Robo de mercancía en rutas y zonas de",
+      "c) Otras incidencias como: almacenar por almacenar, acumular incidencias, mercancía dañada o inservible,",
+      "d) Enviar los servicios a otros destinos con los consecuentes retrasos mínimos de 24 horas, robos de mercancía en rutas y zonas de almacenamiento; e incidencias varias: acúmulo de mercancías, incidencias, mercancía deteriorada,"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Los KPI:",
+    "options": [
+      "a) Son indicadores que ayudan únicamente a mejorar los sistemas de almacén.",
+      "b) Son indicadores que sirven solo para avisar cuando se produce una incidencia.",
+      "c) Los indicadores clave de rendimiento contribuyen al conocimiento de si se está haciendo correctamente el trabajo en relación con los objetivos marcados.",
+      "d) Son un tipo de indicador que no es imprescindible aunque sirve de ayuda en la"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "El GPS:",
+    "options": [
+      "a) Es un sistema de navegación basado en 24",
+      "b) Ofrece posiciones en tres dimensiones, velocidad y tiempo, las 24 horas del día, en cualquier parte del mundo y en todas las condiciones",
+      "c) Al no existir comunicación directa entre el usuario y los satélites, el GPS puede dar servicio a un número ilimitado de",
+      "d) Es un sistema de navegación basado en satélites que ofrece posiciones en tres dimensiones las 24 horas del día, en cualquier parte y en todas las condiciones climáticas y puede dar servicio a un número ilimitado de"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Los objetivos de la gestión de incidencias son:",
+    "options": [
+      "a) Detectar cualquier alteración en los servicios.",
+      "b) Registrar y clasificar estas alteraciones.",
+      "c) Determinar el personal encargado de resolver la incidencia.",
+      "d) Detectar cualquier alteración en los servicios, registrar y clasificarlas y determinar el personal encargado de"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "La gestión reactiva de incidencias:",
+    "options": [
+      "a) Analiza las incidencias que se han producido con el objetivo de prevenirlas incluso antes de que ocurran",
+      "b) Analiza los incidentes ocurridos para descubrir su causa y plantear soluciones a los mismos.",
+      "c) Analiza y simplifica el control de stock.",
+      "d) Analiza las incidencias con el objetivo de despedir al personal que las"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "Forman parte del contenido básico de la información de incidencias:",
+    "options": [
+      "a) Número de registro.",
+      "b) Daños producidos.",
+      "c) Fecha y hora de la incidencia.",
+      "d) Número de registro, daños producidos y fecha y hora de la"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Para los sistemas ERP su objetivo es:",
+    "options": [
+      "a) Ordenar y automatizar todas las áreas estableciendo un sistema diferente para cada una de ellas",
+      "b) Ordenar y automatizar procesos, englobando todas las áreas y funciones de una organización en un solo",
+      "c) Implantar un sistema de calidad.",
+      "d) Ordenar y automatizar las áreas estableciendo un sistema igual e idéntico para cada una de"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "Los sistemas Best of Breed se utilizan:",
+    "options": [
+      "a) En los procesos de elección del mejor software.",
+      "b) En la producción en cadena.",
+      "c) Únicamente en el transporte por carretera.",
+      "d) En la producción en"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "Son aplicaciones del sistema Best of Breed:",
+    "options": [
+      "a) WMS: (Warehouse Management System) Sistema de gestión de almacenes.",
+      "b) SMS: (Stock Management System) Sistema de stock.",
+      "c) IMS: (Trucking Management System) Sistema de transporte.",
+      "d) WMS, SMS y TMS"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Las estrategias logísticas se fundamentan en los procesos de la organización, tales como:",
+    "options": [
+      "a) Variabilidad de la demanda",
+      "b) Planificación.",
+      "c) Gestión de pedidos.",
+      "d) Variabilidad de la demanda, planificación y gestión de pedidos"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Algunas de las ventajas de los sistemas ERP son:",
+    "options": [
+      "a) Visión global y control de la empresa.",
+      "b) Información fiable y accesible.",
+      "c) Mejora de las comunicaciones entre diferentes áreas.",
+      "d) Visión global, control de la empresa, información fiable y accesible y mejora de las comunicaciones entre áreas"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Algunas de las desventajas de los sistemas ERP son:",
+    "options": [
+      "a) Sistemas complejos según el tipo de empresa",
+      "b) Requiere empleados capaces de controlar el sistema",
+      "c) Establecer cambios en el sistema resulta costoso y necesita tiempo",
+      "d) Son sistemas complejos según el tipo de empresa, requiere empleados capaces y los cambios de sistema resultan costosos y necesitan tiempo"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Son sistemas de ERP:",
+    "options": [
+      "a) Aplicación fija",
+      "b) Aplicación parametrizable",
+      "c) Herramienta.",
+      "d) Aplicación fija, parametrizable y herramienta"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "La aplicación de gestión de almacenes (WMS) debe ofrecer en el nivel más básico:",
+    "options": [
+      "a) Distribuir el almacén en áreas de alta, media y baja rotación.",
+      "b) Establecer atributos a los productos (rotación, altura, tipo de peso, etc.)",
+      "c) Gestionar la valoración de los productos aplicando diferentes criterios (FIFO – FEFO, etc.)",
+      "d) Distribuir el almacén en áreas según rotación, establecer atributos a los productos (rotación, altura, tipo de peso, etc.) y gestionar valoración de productos aplicando diferentes criterios (FIFO – FEFO,"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "La aplicación de gestión de transporte (TMS) debe ofrecer:",
+    "options": [
+      "a) Registro de los viajes realizados.",
+      "b) Cálculo de los costes de transporte.",
+      "c) Seguimiento del rendimiento en las entregas de los transportistas",
+      "d) Registro de los viajes, cálculo de los costes de transporte y seguimiento del rendimiento en las entregas de los transportistas"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "La red formal en cadena:",
+    "options": [
+      "a) En este tipo de red de comunicación formal, el jefe actúa como conductor central de la comunicación, los empleados tienen una comunicación directa con él y viceversa. No hay mandos intermedios en la",
+      "b) En este tipo de comunicación los trabajadores se comunican de forma directa con el jefe, pero también directamente con sus compañeros sin intermediarios",
+      "c) Sigue estrictamente la cadena de mando y todos los empleados o subordinados dependen de un solo jefe",
+      "d) Sigue la cadena de mando aunque se puede saltar si no"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "La cadena de suministro abarca:",
+    "options": [
+      "a) La fase de almacenamiento y traslado.",
+      "b) La fase de producción del producto hasta el almacén de la empresa)",
+      "c) Todas las actividades asociadas con el flujo y transformación de bienes e información asociada desde la fase de materias primas hasta el usuario final.",
+      "d) Solo las actividades asociadas con la transformación de bienes desde la fase de materias primas hasta su entrega"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "La información debe:",
+    "options": [
+      "a) Utilizar sistemas informáticos sencillos y fáciles de utilizar para llegar a más usuarios.",
+      "b) Ser comprensible por un numerosas de personas, tener en cuenta al destinatario, emplear lenguaje comprensible y utilizar sistemas informáticos sencillos.",
+      "c) Ser comprensible por un gran número de personas.",
+      "d) Tener en cuenta al destinatario y emplear un lenguaje"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "El servicio al cliente constituye todo el conjunto de acciones necesarias para que el cliente reciba:",
+    "options": [
+      "a) La Información adecuada)",
+      "b) Un tiempo de espera mínimo.",
+      "c) La Información adecuada y el producto deseado.",
+      "d) El producto deseado."
+    ],
+    "correct": 2
+  },
+  {
+    "question": "La trazabilidad consiste en reconstruir la historia del producto, identificando:",
+    "options": [
+      "a) Origen de sus componentes.",
+      "b) Origen de componentes, historia de procesos aplicados y distribución y localización después de la entrega)",
+      "c) Historia de los procesos aplicados al producto.",
+      "d) Distribución y localización después de su entrega)"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "¿Qué opciones da la logística inversa para recuperar los productos:",
+    "options": [
+      "a) Reutilización, reparación, reciclaje y desechar.",
+      "b) Reutilización, reparación y reciclaje.",
+      "c) Reeducar, reconciliar, recoger y desechar.",
+      "d) Redefinir, rentabilizar, reestructuras y"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "Ventajas de la logística inversa sobre la tradicional:",
+    "options": [
+      "a) Ofrece imagen de marca comprometida con el medio ambiente, posibilidad de cambiar el envase y como herramienta para cumplir con la legislación.",
+      "b) Ofrece la posibilidad de cambiar el envase de los productos.",
+      "c) Ofrece una imagen de marca comprometida con el medio ambiente.",
+      "d) Sirve de herramienta para el cumplimiento con la"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "Diferencias entre la logística tradicional y la inversa:",
+    "options": [
+      "a) En la logística tradicional no es tan importante la rapidez en la entrega, mientras que en la logística inversa la rapidez es muy importante.",
+      "b) En la logística tradicional la previsión de la demanda es relativamente sencilla, mientras que en la logística inversa es más compleja)",
+      "c) En la logística tradicional la gestión de inventario es muy compleja, mientras que en la logística inversa es relativamente sencilla)",
+      "d) En la logística tradicional el ciclo de vida del producto es más complejo, mientras que en la logística inversa el ciclo de vida del producto es"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "Los costos directos:",
+    "options": [
+      "a) No se identifican con una sola actividad logística)",
+      "b) Se identifican directamente con una actividad logística)",
+      "c) Se identifican indirectamente con una actividad productiva)",
+      "d) Es el valor que supone dejar de invertir en algo para hacerlo en otra cosa)"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "El costo total es:",
+    "options": [
+      "a) La resta de los costos fijos costos variables.",
+      "b) La suma de los costos fijos unitarios + los costos variables unitarios.",
+      "c) La suma de los costos fijos + costos variables.",
+      "d) Los costos variables totales / cantidad"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "Causas para la variación de costes logisticos entre unas empresas y otras:",
+    "options": [
+      "a) No tienen procesos ni criterios estandarizados.",
+      "b) Los métodos de contabilidad no obtienen toda la información más importante.",
+      "c) Existen dificultades de acceso a los datos.",
+      "d) No tienen procesos ni criterios estandarizados, existen dificultades de acceso a datos y los métodos de contabilidad no obtienen la información"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "La distribución escalonada:",
+    "options": [
+      "a) Es utilizada por empresas que actúan en un mercado nacional o internacional.",
+      "b) Es utilizada por empresas que actúan en un mercado local.",
+      "c) Es utilizada por empresas que fabrican bajo pedido.",
+      "d) Es utilizada por empresas que actúan exclusivamente en un mercado"
+    ],
+    "correct": 0
+  },
+  {
+    "question": "Como inconvenientes de la distribución escalonada tenemos:",
+    "options": [
+      "a) Lentitud en las entregas.",
+      "b) Gran inversión en almacenes y distribución.",
+      "c) Coste elevado de stocks mínimos.",
+      "d) Gran inversión en almacenes, distribución y coste elevado de stocks"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "Las empresas que contratan el Outsourcing buscan:",
+    "options": [
+      "a) Centralización en las actividades principales de la empresa)",
+      "b) Centralización en las actividades de la empresa, externalizar áreas auxiliares y de distribución y minimizar costes.",
+      "c) Externalizar áreas auxiliares y de distribución.",
+      "d) Minimizar"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "Los costes de transporte se calculan teniendo en cuenta:",
+    "options": [
+      "a) Amortización + financiación + alquileres, etc)",
+      "b) Los costes fijos + costes variables + otros gastos.",
+      "c) Valor promedio de los inventarios + gastos de seguros + costo de obsolescencia, etc)",
+      "d) Gastos de personal de compras y almacén + costo del suministro + comunicaciones, etc)"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "En el transporte y entrega, alguna de las medidas que se pueden tomar para evitar puntos críticos son:",
+    "options": [
+      "a) Aprovechar al máximo el número de cargas completas.",
+      "b) Reducir número de vehículos y aprovechar el número de cargas completas.",
+      "c) Fijar las estanterías al suelo.",
+      "d) Reducir el número de vehículos"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "Son incidencias más frecuentes:",
+    "options": [
+      "a) Enviar los servicios a otros destinos, que trae como consecuencia inmediata retrasos mínimos de 24 horas en la mayoría de los casos.",
+      "b) Enviar los servicios a otros destinos con sus consecuentes retrasos, robo de mercancía en rutas y zonas de almacenamiento, acumular mercancías, incidencias, mercancía dañada o inservible, etc)",
+      "c) Otras incidencias como: almacenar por almacenar, acumular incidencias, mercancía dañada o inservible, etc)",
+      "d) Robo de mercancía en rutas y zonas de"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "Los KPI:",
+    "options": [
+      "a) Son indicadores que sirven para detectar a los empleados menos eficientes.",
+      "b) Son indicadores que ayudan únicamente a mejorar los sistemas de almacén.",
+      "c) Los indicadores clave de rendimiento contribuyen al conocimiento de si se está haciendo correctamente el trabajo en relación con los objetivos marcados.",
+      "d) Son indicadores que sirven solo para avisar cuando se produce una incidencia)"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "Son sistemas de ERP:",
+    "options": [
+      "a) Herramienta)",
+      "b) Aplicación fija)",
+      "c) Aplicación fija, parametrizable y herramienta)",
+      "d) Aplicación"
+    ],
+    "correct": 2
+  },
+  {
+    "question": "La aplicación de gestión de almacenes (WMS) debe ofrecer en el nivel más básico:",
+    "options": [
+      "a) Gestionar la valoración de los productos aplicando diferentes criterios (FIFO - FEFO, etc)).",
+      "b) Establecer atributos a los productos (rotación, altura, tipo de peso, etc)).",
+      "c) Distribuir el almacén en áreas de alta, media y baja rotación.",
+      "d) Distribuir el almacén en áreas de rotación, establecer atributos a los productos y gestionar la valoración de los productos aplicando"
+    ],
+    "correct": 3
+  },
+  {
+    "question": "La aplicación de gestión de transporte (TMS) debe",
+    "options": [
+      "a) Seguimiento del rendimiento en las entregas de los transportistas.",
+      "b) Registro de los viajes realizados.",
+      "c) Cálculo de los costes de transporte.",
+      "d) Registro de viajes, cálculo de los costes de transporte y seguimiento del rendimiento en las"
+    ],
+    "correct": 3
+  }
+];
+            let DOM = {};
+
+            const estado = {
+                preguntaActual: 0,
+                respuestasCorrectas: 0,
+                respuestasIncorrectas: 0,
+                totalPreguntas: preguntas.length
+            };
+
+            let botonesOpciones;
+            let indicesPreguntas;
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            function toggleClasses(element, addClass, removeClasses) {
+                if (removeClasses && removeClasses.length > 0) {
+                    removeClasses.forEach(cls => element.classList.remove(cls));
+                }
+                if (addClass) {
+                    element.classList.add(addClass);
+                }
+            }
+
+            function mostrarModal(message) {
+                DOM.modalMessage.textContent = message;
+                DOM.modalOverlay.classList.remove('hidden');
+            }
+
+            function ocultarModal() {
+                DOM.modalOverlay.classList.add('hidden');
+            }
+
+            function marcarRespuesta(index) {
+                const pregunta = preguntas[index];
+
+                const botonCorrecto = botonesOpciones[pregunta.correct];
+                const indiceCorrecto = indicesPreguntas[index];
+
+                toggleClasses(indiceCorrecto, null, ['correcta', 'incorrecta']);
+
+                if (pregunta.respuestaUsuario !== null) {
+                    toggleClasses(botonCorrecto, 'correcta');
+
+                    if (pregunta.esCorrecta) {
+                        toggleClasses(indiceCorrecto, 'correcta');
+                    } else {
+                        const botonSeleccionado = botonesOpciones[pregunta.respuestaUsuario];
+                        toggleClasses(botonSeleccionado, 'incorrecta');
+                        toggleClasses(indiceCorrecto, 'incorrecta');
+                    }
+                }
+            }
+
+            function mostrarPregunta() {
+                const { preguntaActual, totalPreguntas } = estado;
+                DOM.resultadosFinales.classList.add('hidden');
+                DOM.contenidoPregunta.classList.remove('hidden');
+                DOM.rectanguloResumen.classList.remove('hidden');
+                DOM.finalizarBtn.textContent = 'Finalizar Test';
+
+                const pregunta = preguntas[preguntaActual];
+                const cleanedQuestion = pregunta.question.replace(/^\s*(\d+\.\s*)+/, '');
+                DOM.preguntaTexto.textContent = `${preguntaActual + 1}. ${cleanedQuestion}`;
+
+                botonesOpciones.forEach((boton, index) => {
+                    toggleClasses(boton, null, ['seleccionada', 'correcta', 'incorrecta']);
+                    boton.textContent = pregunta.options[index];
+                    boton.disabled = pregunta.comprobada;
+                });
+
+                if (pregunta.respuestaUsuario !== null) {
+                    toggleClasses(botonesOpciones[pregunta.respuestaUsuario], 'seleccionada');
+                    if (pregunta.comprobada) {
+                        marcarRespuesta(preguntaActual);
+                    }
+                }
+
+                if (indicesPreguntas) {
+                    indicesPreguntas.forEach(indice => indice.classList.remove('activa'));
+                    indicesPreguntas[preguntaActual].classList.add('activa');
+                }
+
+                DOM.comprobarBtn.classList.toggle('hidden', pregunta.comprobada);
+                actualizarEstadoBotones();
+            }
+
+            function manejarSeleccion(event) {
+                const boton = event.target.closest('.opcion');
+                if (boton) {
+                    const pregunta = preguntas[estado.preguntaActual];
+                    if (!pregunta.comprobada) {
+                        botonesOpciones.forEach(b => toggleClasses(b, null, ['seleccionada']));
+                        toggleClasses(boton, 'seleccionada');
+                    }
+                }
+            }
+
+            function comprobarRespuesta() {
+                const respuestaSeleccionadaActual = DOM.opcionesContenedor.querySelector('.opcion.seleccionada');
+                if (!respuestaSeleccionadaActual) {
+                    mostrarModal('Por favor, selecciona una respuesta antes de comprobar.');
+                    return;
+                }
+                const { preguntaActual } = estado;
+                const pregunta = preguntas[preguntaActual];
+                const respuestaIndex = parseInt(respuestaSeleccionadaActual.dataset.index);
+
+                pregunta.respuestaUsuario = respuestaIndex;
+                pregunta.comprobada = true;
+                pregunta.esCorrecta = (respuestaIndex === pregunta.correct);
+
+                if (pregunta.esCorrecta) {
+                    estado.respuestasCorrectas++;
+                } else {
+                    estado.respuestasIncorrectas++;
+                }
+
+                marcarRespuesta(preguntaActual);
+                actualizarResumen();
+
+                botonesOpciones.forEach(boton => boton.disabled = true);
+                DOM.comprobarBtn.classList.add('hidden');
+            }
+
+            function actualizarEstadoBotones() {
+                const { preguntaActual, totalPreguntas } = estado;
+                const esUltimaPregunta = preguntaActual === totalPreguntas - 1;
+                DOM.volverBtn.disabled = preguntaActual === 0;
+                DOM.siguienteBtn.textContent = esUltimaPregunta ? 'Terminar' : 'Siguiente';
+            }
+
+            function siguientePregunta() {
+                const { preguntaActual, totalPreguntas } = estado;
+                if (preguntaActual < totalPreguntas - 1) {
+                    estado.preguntaActual++;
+                    mostrarPregunta();
+                } else {
+                    mostrarResultados();
+                }
+            }
+
+            function volverPregunta() {
+                const { preguntaActual } = estado;
+                if (preguntaActual > 0) {
+                    estado.preguntaActual--;
+                    mostrarPregunta();
+                }
+            }
+
+            function mostrarResultados() {
+                const { respuestasCorrectas, respuestasIncorrectas } = estado;
+                DOM.contenidoPregunta.classList.add('hidden');
+                DOM.resultadosFinales.classList.remove('hidden');
+
+                const correctasSpan = `<span class="resultados-finales-correctas">Correctas: ${respuestasCorrectas}</span>`;
+                const incorrectasSpan = `<span class="resultados-finales-incorrectas">Incorrectas: ${respuestasIncorrectas}</span>`;
+                DOM.resultadosTexto.innerHTML = `${correctasSpan} | ${incorrectasSpan}`;
+
+                DOM.finalizarBtn.textContent = 'Volver al Test';
+                DOM.rectanguloResumen.style.marginTop = '20px';
+            }
+
+            function crearIndices() {
+                DOM.indicesContenedor.innerHTML = Array.from(
+                    {length: estado.totalPreguntas},
+                    (_, i) => `<div class="indice-pregunta" data-index="${i}">${i+1}</div>`
+                ).join('');
+                indicesPreguntas = DOM.indicesContenedor.querySelectorAll('.indice-pregunta');
+            }
+
+            function manejarClickIndice(event) {
+                const indice = event.target.closest('.indice-pregunta');
+                if (indice) {
+                    estado.preguntaActual = parseInt(indice.dataset.index);
+                    mostrarPregunta();
+                }
+            }
+
+            function actualizarResumen() {
+                indicesPreguntas.forEach((indice, index) => {
+                    toggleClasses(indice, null, ['correcta', 'incorrecta']);
+                    const pregunta = preguntas[index];
+                    if (pregunta.comprobada) {
+                        if (pregunta.esCorrecta) {
+                            toggleClasses(indice, 'correcta');
+                        } else {
+                            toggleClasses(indice, 'incorrecta');
+                        }
+                    }
+                });
+            }
+
+            function toggleFinalizarTest() {
+                if (DOM.resultadosFinales.classList.contains('hidden')) {
+                    mostrarResultados();
+                } else {
+                    mostrarPregunta();
+                }
+            }
+            
+
+            function cacheElements() {
+                return {
+                    preguntaTexto: document.getElementById('pregunta-texto'),
+                    opcionesContenedor: document.getElementById('opciones-contenedor'),
+                    siguienteBtn: document.getElementById('siguiente-btn'),
+                    volverBtn: document.getElementById('volver-btn'),
+                    comprobarBtn: document.getElementById('comprobar-btn'),
+                    indicesContenedor: document.getElementById('indices-contenedor'),
+                    contenedorTest: document.querySelector('section.contenedor-test'),
+                    rectanguloResumen: document.querySelector('footer.rectangulo-resumen'),
+                    modalOverlay: document.getElementById('custom-modal-overlay'),
+                    modalMessage: document.getElementById('custom-modal-message'),
+                    modalOkBtn: document.getElementById('custom-modal-ok'),
+                    contenidoPregunta: document.getElementById('contenido-pregunta'),
+                    resultadosFinales: document.getElementById('resultados-finales'),
+                    resultadosTexto: document.getElementById('resultados-texto'),
+                    finalizarBtn: document.getElementById('finalizar-btn')
+                };
+            }
+
+            function initData() {
+                const labels = ['a) ', 'b) ', 'c) ', 'd) '];
+                preguntas.forEach(p => {
+                    if (p.options && p.options.length > 0 && typeof p.correct === 'number' && p.correct < p.options.length) {
+                        const correctAnswerText = p.options[p.correct].substring(3).trim();
+                        let answerTexts = p.options.map(opt => opt.substring(3).trim());
+                        
+                        for (let i = answerTexts.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [answerTexts[i], answerTexts[j]] = [answerTexts[j], answerTexts[i]];
+                        }
+                        
+                        p.options = answerTexts.map((text, index) => labels[index] + text);
+                        const newCorrectIndex = answerTexts.findIndex(text => text === correctAnswerText);
+                        
+                        if (newCorrectIndex !== -1) {
+                           p.correct = newCorrectIndex;
+                        }
+                    }
+                });
+
+                shuffleArray(preguntas);
+                preguntas = preguntas.map(p => ({
+                    ...p,
+                    respuestaUsuario: null,
+                    comprobada: false,
+                    esCorrecta: false
+                }));
+
+                const fragmentoOpciones = document.createDocumentFragment();
+                for (let i = 0; i < 4; i++) {
+                    const boton = document.createElement('button');
+                    boton.className = 'opcion';
+                    boton.dataset.index = i;
+                    fragmentoOpciones.appendChild(boton);
+                }
+                DOM.opcionesContenedor.appendChild(fragmentoOpciones);
+
+                botonesOpciones = Array.from(DOM.opcionesContenedor.querySelectorAll('.opcion'));
+
+                crearIndices();
+            }
+
+            function setupEvents() {
+                DOM.contenedorTest.addEventListener('click', (event) => {
+                    const target = event.target;
+                    if (target.id === 'siguiente-btn') {
+                        siguientePregunta();
+                    } else if (target.id === 'volver-btn') {
+                        volverPregunta();
+                    } else if (target.id === 'comprobar-btn') {
+                        comprobarRespuesta();
+                    } else if (target.classList.contains('opcion')) {
+                        manejarSeleccion(event);
+                    }
+                });
+
+                DOM.rectanguloResumen.addEventListener('click', (event) => {
+                    const target = event.target;
+                    if (target.id === 'finalizar-btn') {
+                        toggleFinalizarTest();
+                    } else if (target.classList.contains('indice-pregunta')) {
+                        manejarClickIndice(event);
+                    }
+                });
+
+                DOM.modalOkBtn.addEventListener('click', ocultarModal);
+                
+            }
+
+            function init() {
+                DOM = cacheElements();
+                initData();
+                setupEvents();
+                mostrarPregunta();
+            }
+
+            init();
+        });
+    </script>
+</body>
+</html>
