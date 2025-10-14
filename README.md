@@ -1,7 +1,7 @@
 # (COML0309) ORGANIZACION Y GESTION DE ALMACENES
 Test de los módulos del certificado de profesionalidad, tanto del curso como de repaso.
 Los módulos son:
-  - MF1013_3: Organización de almacenes compuesto por las unidades formativas:
+  - MF1013_3: Organización de almacenes. Compuesto por las unidades formativas:
     + UF0926 Diseño y organización del almacén.
     + UF0927 Gestión del equipo de trabajo del almacén.
     + UF0928 Seguridad y prevención de riesgos en el almacén.
