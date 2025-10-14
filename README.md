@@ -1,2 +1,2 @@
-# MF1014_3-Organizaci-n-de-Almacenes
-Repaso de test del módulo MF1014_3 Organización de Almacenes
+# COML0309_ORGANIZACION_Y_GESTION_DE_ALMACENES
+Test de los módulos del certificado de profesional, tanto del curso como de repaso.
